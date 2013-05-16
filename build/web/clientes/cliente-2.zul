@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <zk xmlns="http://www.zkoss.org/2005/zul"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+     
+        <style src="css/zul/zksample2.css" />
+     
+        <window id="window_customerDialog" title="Customer" border="none"
+           closable="true" width="900px" mode="modal" height="600px"
+           sizable="true">
+    
+    
+       <div sclass="z-toolbar" style="padding:0">
+            <hbox pack="stretch" sclass="hboxRemoveWhiteStrips"
+                 width="100%">
+  
+                <!-- COMMON BUTTONS -->
+                   <toolbar align="start"
+                       style="float:left; border-style: none;">
+    
+                       <toolbarbutton id="btnHelp"
+                           image="/images/icons/light_16x16.gif" />
+    
+                   </toolbar>
+    
+                   <!-- SEARCH AREA -->
+                   <toolbar align="center"
+                       style="float:left; border-style: none;">
+                       <hbox align="center" style="padding: 2px"></hbox>
+                   </toolbar>
+    
+                   <!-- CRUD BUTTONS -->
+                   <toolbar align="end"
+                       style="float:right; border-style: none;">
+                       <button id="btnNew" sclass="oT_ButtonWithIcon" />
+                       <button id="btnEdit" sclass="oT_ButtonWithIcon" />
+                       <button id="btnDelete" sclass="oT_ButtonWithIcon" />
+                       <button id="btnSave" sclass="oT_ButtonWithIcon" />
+                       <button id="btnCancel" sclass="oT_ButtonWithIcon" />
+                       <button id="btnClose" sclass="oT_ButtonWithIcon" />
+                   </toolbar>
+               </hbox>
+           </div>
+    
+           <borderlayout id="borderlayoutCustomer">
+               <north border="none" margins="0,0,0,0"></north>
+    
+               <center border="none">
+                   <div id="divCenterCustomer">
+    
+                       <tabbox id="tabBoxCustomer" width="100%">
+                           <tabs>
+                               <tab id="tabCustomerDialogAddress"
+                                   label="Address" />
+                               <tab id="tabCustomerDialogChart"
+                                   label="Chart" />
+                               <tab id="tabCustomerDialogOrders"
+                                   label="Orders" />
+                               <tab id="tabCustomerDialogMemos"
+                                   label="Memos" />
+                           </tabs>
+                           <tabpanels>
+    
+                               <!-- Tab Address -->
+                               <tabpanel id="tabPanelCustomerAddress"
+                                   height="100%" style="border: 0px; padding: 0px">
+    
+                                   <hbox align="stretch" pack="stretch"
+                                       sclass="FDCenterNoBorder" width="100%">
+    
+                                       <!-- Left CONTENT AREA -->
+                                       <!-- simulates a columnLayout -->
+                                       <cell width="50%">
+                                           <vbox align="stretch"
+                                               pack="stretch" width="100%" style="padding: 13px;">
+                                               <div>
+    
+                                                   <panel
+                                                       id="panel_CustomerDialog_Address" border="none">
+                                                       <panelchildren>
+    
+                                                           <groupbox
+                                                               id="gb_address" mold="3d" closable="false">
+                                                               <caption
+                                                                   image="/images/icons/view.gif" label="Address" />
+    
+                                                               <grid
+                                                                   sclass="GridPlain">
+                                                                   <columns>
+                                                                       <column
+                                                                           align="right" width="150px" />
+                                                                       <column
+                                                                           width="100%" />
+                                                                   </columns>
+                                                                   <rows>
+                                                                       <row>
+                                                                           <hbox>
+                                                                               <label
+                                                                                  value="Customer No" />
+                                                                              <label
+                                                                                  value="*" style="color:red;font-size:10px" />
+                                                                          </hbox>
+   
+                                                                          <textbox
+                                                                              id="kunNr" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <separator
+                                                                              bar="true">
+                                                                          </separator>
+                                                                          <separator
+                                                                              bar="true">
+                                                                          </separator>
+                                                                      </row>
+                                                                      <row>
+                                                                          <hbox>
+                                                                              <label
+                                                                                  value="Match Code" />
+                                                                              <label
+                                                                                  value="*" style="color:red;font-size:10px" />
+                                                                          </hbox>
+   
+                                                                          <textbox
+                                                                              id="kunMatchcode" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <separator
+                                                                              bar="true">
+                                                                          </separator>
+                                                                          <separator
+                                                                              bar="true">
+                                                                          </separator>
+                                                                      </row>
+                                                                      <row>
+                                                                          <hbox>
+                                                                              <label
+                                                                                  value="Name1" />
+                                                                              <label
+                                                                                  value="*" style="color:red;font-size:10px" />
+                                                                          </hbox>
+   
+                                                                          <textbox
+                                                                              id="kunName1" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunName2" value="Name2" />
+                                                                          <textbox
+                                                                              id="kunName2" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <hbox>
+                                                                              <label
+                                                                                  value="City" />
+                                                                              <label
+                                                                                  value="*" style="color:red;font-size:10px" />
+                                                                          </hbox>
+   
+                                                                          <textbox
+                                                                              id="kunOrt" hflex="1" />
+                                                                      </row>
+   
+                                                                      <row>
+                                                                          <hbox>
+                                                                              <label
+                                                                                  value="Branch" />
+                                                                              <label
+                                                                                  value="*" style="color:red;font-size:10px" />
+                                                                          </hbox>
+   
+                                                                          <grid
+                                                                              sclass="GridPlainOneTextboxAndButtonRow">
+                                                                              <columns>
+                                                                                  <column
+                                                                                      width="100%" />
+                                                                                  <column
+                                                                                      align="right" width="100px" />
+                                                                              </columns>
+                                                                              <rows>
+   
+                                                                                  <row>
+                                                                                      <textbox
+                                                                                          id="kunBranche" hflex="1" />
+   
+                                                                                      <hbox>
+                                                                                          <space
+                                                                                              width="5px" />
+                                                                                          <button
+                                                                                              id="btnSearchBranchSimple" disabled="true"
+                                                                                              width="28px"
+                                                                                              image="/images/icons/btn_search2_16x16.gif" />
+                                                                                          <button
+                                                                                              id="btnSearchBranchAdvanced" disabled="true"
+                                                                                              width="28px"
+                                                                                              image="/images/icons/btn_search2_16x16.gif" />
+                                                                                          <button
+                                                                                              id="btnSearchBranchExtended" disabled="true"
+                                                                                              width="28px"
+                                                                                              image="/images/icons/btn_search2_16x16.gif" />
+   
+                                                                                      </hbox>
+                                                                                  </row>
+   
+                                                                              </rows>
+                                                                          </grid>
+   
+                                                                      </row>
+                                                                  </rows>
+                                                              </grid>
+                                                          </groupbox>
+                                                      </panelchildren>
+                                                  </panel>
+                                               <separator spacing="20px" />
+                                                          
+                                                  <panel
+                                                      id="panel_CustomerDialog_Addition" border="none">
+                                                      <panelchildren>
+                                                           
+                                                          <groupbox
+                                                              id="gb_Addition" mold="3d" closable="false">
+                                                              <caption
+                                                                  image="/images/icons/table.gif" label="Additionaly 1" />
+   
+                                                              <grid
+                                                                  sclass="GridPlain">
+                                                                  <columns>
+                                                                      <column
+                                                                          align="right" width="150px" />
+                                                                      <column
+                                                                          width="100%" />
+                                                                  </columns>
+                                                                  <rows>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunMahnsperre"
+                                                                              value="Lock Remainder" />
+                                                                          <checkbox
+                                                                              id="kunMahnsperre" />
+                                                                      </row>
+                                                                  </rows>
+                                                              </grid>
+                                                          </groupbox>
+                                                      </panelchildren>
+                                                  </panel>
+                                                       <separator spacing="20px" />
+                                                  <panel
+                                                      id="panel_CustomerDialog_Phone" border="none">
+                                                      <panelchildren>
+   
+                                                          <groupbox
+                                                              id="gb_Phone" mold="3d" closable="false">
+                                                              <caption
+                                                                  image="/images/icons/telephone_16x16.png"
+                                                                  label="Phone/Fax" />
+   
+                                                              <grid
+                                                                  sclass="GridPlain">
+                                                                  <columns>
+                                                                      <column
+                                                                          align="right" width="150px" />
+                                                                      <column
+                                                                          width="100%" />
+                                                                  </columns>
+                                                                  <rows>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunPhone1" value="Phone1" />
+                                                                          <textbox
+                                                                              value="not used in example" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunPhone2" value="Phone2" />
+                                                                          <textbox
+                                                                              value="not used in example" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunMobile" value="Mobile" />
+                                                                          <textbox
+                                                                              value="not used in example" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunFax1" value="Fax1" />
+                                                                          <textbox
+                                                                              value="not used in example" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunFax2" value="Fax2" />
+                                                                          <textbox
+                                                                              value="not used in example" hflex="1" />
+                                                                      </row>
+                                                                  </rows>
+                                                              </grid>
+                                                          </groupbox>
+                                                      </panelchildren>
+                                                  </panel>
+   
+                                              </div>
+                                          </vbox>
+                                      </cell>
+                                      <separator spacing="20px" />
+                                      <!-- Right AREA -->
+                                      <cell width="50%">
+                                          <vbox align="stretch"
+                                              pack="stretch" width="100%" style="padding: 13px;">
+                                              <div>
+   
+                                                  <panel
+                                                      id="panel_CustomerDialog_PayConditions" border="none"
+                                                      visible="true">
+                                                      <panelchildren>
+   
+                                                          <groupbox
+                                                              id="gb_PayConditions" mold="3d" closable="false">
+                                                              <caption
+                                                                  image="/images/icons/money_16x16.png" label="Payment" />
+   
+                                                              <grid
+                                                                  sclass="GridPlain">
+                                                                  <columns>
+                                                                      <column
+                                                                          align="right" width="150px" />
+                                                                      <column
+                                                                          width="100%" />
+                                                                  </columns>
+                                                                  <rows>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunPayCondition"
+                                                                              value="Payment Condition" />
+                                                                          <listbox
+                                                                              mold="select" rows="1" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_kunBonitaet"
+                                                                              value="Credit Note" />
+                                                                          <intbox
+                                                                              id="intbox_CustomerDialog_kunBonitaet" width="50px" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_AmountLastYear"
+                                                                              value="Amount Last Year" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_AmountCurrentYear"
+                                                                              value="Amount Current Year" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_AmountCurrentMonth"
+                                                                              value="Amount Current Month" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_AmountLastInvoice"
+                                                                              value="Amount Last Invoice" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                  </rows>
+                                                              </grid>
+                                                          </groupbox>
+                                                      </panelchildren>
+                                                  </panel>
+                                                  <separator spacing="20px" />
+                                                  <panel
+                                                      id="panel_CustomerDialog_Addition2" border="none">
+                                                      <panelchildren>
+   
+                                                          <groupbox
+                                                              id="gb_Addition2" mold="3d" closable="false">
+                                                              <caption
+                                                                  image="/images/icons/text_signature_16x16.png"
+                                                                  label="Additionally 2" />
+   
+                                                              <grid
+                                                                  sclass="GridPlain">
+                                                                  <columns>
+                                                                      <column
+                                                                          align="right" width="150px" />
+                                                                      <column
+                                                                          width="100%" />
+                                                                  </columns>
+                                                                  <rows>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_Addition1"
+                                                                              value="Addition1" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_Addition2"
+                                                                              value="Addition2" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_Addition3"
+                                                                              value="Addition3" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_Addition4"
+                                                                              value="Addition4" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                      <row>
+                                                                          <label
+                                                                              id="label_CustomerDialog_Addition5"
+                                                                              value="Addition5" />
+                                                                          <textbox
+                                                                              value="not used at time" hflex="1" />
+                                                                      </row>
+                                                                  </rows>
+                                                              </grid>
+                                                          </groupbox>
+                                                      </panelchildren>
+                                                  </panel>
+   
+                                              </div>
+                                          </vbox>
+                                      </cell>
+                                  </hbox>
+   
+                              </tabpanel>
+   
+                              <tabpanel id="tabPanelCustomerDialogChart"
+                                  height="100%" style="border: 0px; padding: 0px">
+                              </tabpanel>
+   
+                              <tabpanel id="tabPanelCustomerOrders"
+                                  height="100%" style="border: 0px; padding: 0px" />
+   
+                              <tabpanel id="tabPanelCustomerMemos"
+                                  height="100%" style="border: 0px; padding: 0px">
+                                  not used yet
+                              </tabpanel>
+                          </tabpanels>
+                      </tabbox>
+   
+                  </div>
+              </center>
+   
+          </borderlayout>
+   
+   
+      </window>
+  </zk>
+

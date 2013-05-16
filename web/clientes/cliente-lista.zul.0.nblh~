@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" title="Clientes" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.clientes.ClienteViewModel')"
+            validationMessages="@id('vmsgs')" >
+
+        <div><include src="../menu.zul"/></div>
+        <menubar id="menu" >
+            <menuitem id="add" image="../images/nuevo.png" label="Nuevo" onClick="@command('add')" tooltiptext="Nuevo"/>
+            <menuitem id="update" image="../images/guardar.png" label="Guardar" onClick="@command('update'), Desactivar()" disabled="@load(empty vm.selectedEvent)" tooltiptext="Guardar"/>
+            <menuseparator />
+            <menuitem id="activar" image="../images/modificar.png"   label="Modificar"   onClick="Activar()" tooltiptext="Activar"/>
+            <menuitem id="delete"  image="../images/delete.png" label="Eliminar"    onClick="@command('delete')" disabled="@load(empty vm.selectedEvent)" tooltiptext="Eliminar"/>
+            <zscript>
+                    Activar() {
+                        txtNIF.setDisabled(false);
+                        txtNombre.setDisabled(false);
+                        txtApellidos.setDisabled(false);
+                        txtDireccion.setDisabled(false);
+                        txtCiudad.setDisabled(false);
+                        txtProvincia.setDisabled(false);
+                        intTelefono.setDisabled(false);
+                        intTelefono2.setDisabled(false);
+                        txtEmail.setDisabled(false);
+                        update.setDisabled(false);
+                        delete.setDisabled(false);
+                    }
+                    Desactivar() {
+                        txtNIF.setDisabled(true);
+                        txtNombre.setDisabled(true);
+                        txtApellidos.setDisabled(true);
+                        txtDireccion.setDisabled(true);
+                        txtCiudad.setDisabled(true);
+                        txtProvincia.setDisabled(true);
+                        intTelefono.setDisabled(true);
+                        intTelefono2.setDisabled(true);
+                        txtEmail.setDisabled(true);
+                        update.setDisabled(true);
+                        delete.setDisabled(true);
+                    }
+            </zscript>
+        </menubar>
+        <!--<div width="750px" height="453px"></div>-->
+        <!--<textbox value="@bind(vm.filter)" onChange="@command('doSearch')" instant="true"/>-->
+        <listbox id="box" mold="paging" pageSize="13" multiple="true" rows="13" model="@bind(vm.events)" selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <listheader label="NIF"         sort="auto(nif)"/>
+                <listheader label="Nombre"      sort="auto(nombre)" />
+                <listheader label="Apellidos"   sort="auto(apellidos)" />
+                <!--<listheader label="Fecha Alta"  sort="auto(fecha_alta)"  width="170px" />-->
+                <listheader label="Direccion"   sort="auto(direccion)"/>
+                <listheader label="Ciudad"      sort="auto(ciudad)"/>
+                <listheader label="Provincia"   sort="auto(Provincia)"/>
+                <listheader label="Telefono"    sort="auto(telefono)"/>
+                <listheader label="Telefono 2"  sort="auto(telefono2)"/>
+                <listheader label="Email"       sort="auto(email)"/>
+                <listheader label="Fecha alta"  sort="auto(fecha_alta)"/>
+            </listhead>
+            <template name="model" var="zk_cliente">
+                <listitem value="@load(zk_cliente)" >
+
+                    <listcell label="@load(zk_cliente.nif)"  context="${zk_cliente.nif}"> <!--popup="@load(zk_cliente.nif)"-->
+                        <!--<popup id="@load(zk_cliente.nif)" width="auto">
+                            <vlayout>
+                                <toolbarbutton label="Modificar datos cliente" href="cliente.zul?nif=${zk_cliente.nif}" />
+                                <toolbarbutton label="Añadir Mascota" onClick='Executions.sendRedirect("proveedores.zul?nif=49037135P");'/>
+                            </vlayout>
+                        </popup>-->
+                        <menupopup id="${zk_cliente.nif}">
+                            <menuitem label="Modificar datos cliente" href="cliente-nuevo.zul?nif=${zk_cliente.nif}"  />
+                            <menuitem label="Listar Mascotas" onClick="@command('showMascotas')" />
+                            <menuitem label="Asignar Mascota" onClick="@command('asignarMascota')" />
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_cliente.nombre)" />
+                    <listcell label="@load(zk_cliente.apellidos)" />
+                    <!--<listcell label="@load(zk_cliente.fecha_alta)" />-->
+                    <listcell label="@load(zk_cliente.direccion)" />
+                    <listcell label="@load(zk_cliente.ciudad)" />
+                    <listcell label="@load(zk_cliente.provincia)" />
+                    <listcell label="@load(zk_cliente.telefono)" />
+                    <listcell label="@load(zk_cliente.telefono2)" />
+                    <listcell label="@load(zk_cliente.email)" />
+                    <listcell label="@load(zk_cliente.fecha_alta)" />
+                    
+                </listitem>
+            </template>
+        </listbox>
+        
+        <groupbox id="mygrp"
+                  form="@id('zk_cliente') @load(vm.selectedEvent) @save(vm.selectedEvent, before='update') 
+                        @save(vm.newEvent, before='add') @validator('es.clinica.veterinaria.clientes.ClienteValidator')">
+            <caption label="Cliente Nuevo" />
+            <div style="margin-bottom:10px">
+                NIF:    <textbox id="txtNIF"    cols="25" value="@bind(zk_cliente.nif)"     style="margin-left:33px; margin-right: 15px" disabled="@load(not empty vm.selectedEvent)" />
+                Nombre: <textbox id="txtNombre" cols="25" value="@bind(zk_cliente.nombre)"  style="margin-left: 10px; margin-right:15px" disabled="@load(not empty vm.selectedEvent)" />
+                Apellidos:<textbox id="txtApellidos" cols="25" value="@bind(zk_cliente.apellidos)" style="margin-left: 2px;" disabled="@load(not empty vm.selectedEvent)" />
+            </div>
+           <!-- Fecha Alta:
+                <datebox id="dateFechaAlta" cols="8" value="@bind(zk_cliente.fecha_alta)" />-->
+            <div style="margin-bottom:10px">
+                Direccion:  <textbox id="txtDireccion"  cols="25" value="@bind(zk_cliente.direccion)" style="margin-right:15px" disabled="@load(not empty vm.selectedEvent)"/>
+                Ciudad:     <textbox id="txtCiudad"     cols="25" value="@bind(zk_cliente.ciudad)"    style="margin-left: 15px; margin-right: 14px" disabled="@load(not empty vm.selectedEvent)" />
+                Provincia:  <textbox id="txtProvincia"  cols="25" value="@bind(zk_cliente.provincia)" disabled="@load(not empty vm.selectedEvent)"/>
+            </div>
+            <div style="margin-bottom:10px">
+                Telefono:   <intbox id="intTelefono"    cols="25" value="@bind(zk_cliente.telefono)"  style="margin-left:3px; margin-right:15px" disabled="@load(not empty vm.selectedEvent)"/>
+                Telefono2:  <intbox id="intTelefono2"   cols="25" value="@bind(zk_cliente.telefono2)" style="margin-right:15px;" disabled="@load(not empty vm.selectedEvent)"/>
+                Email:      <textbox id="txtEmail"      cols="25" value="@bind(zk_cliente.email)"     style="margin-left:18px" constraint="/.+@.+\.[a-z]+/: Por favor, introduce una dirección de e-mail" disabled="@load(not empty vm.selectedEvent)"/>
+            </div>    
+            
+                
+            <zscript>
+                Activar() {
+                    txtNIF.setDisabled(false);
+                    txtNombre.setDisabled(false);
+                    txtApellidos.setDisabled(false);
+                    txtDireccion.setDisabled(false);
+                    txtCiudad.setDisabled(false);
+                    txtProvincia.setDisabled(false);
+                    intTelefono.setDisabled(false);
+                    intTelefono2.setDisabled(false);
+                    txtEmail.setDisabled(false);
+                    update.setDisabled(false);
+                    delete.setDisabled(false);
+                }
+                Desactivar() {
+                    txtNIF.setDisabled(true);
+                    txtNombre.setDisabled(true);
+                    txtApellidos.setDisabled(true);
+                    txtDireccion.setDisabled(true);
+                    txtCiudad.setDisabled(true);
+                    txtProvincia.setDisabled(true);
+                    intTelefono.setDisabled(true);
+                    intTelefono2.setDisabled(true);
+                    txtEmail.setDisabled(true);
+                    update.setDisabled(true);
+                    delete.setDisabled(true);
+                }
+            </zscript>
+          
+            <hlayout>
+                <label style="color:red" value="@load(vmsgs['nif'])" />
+                <label style="color:red" value="@load(vmsgs['nombre'])" />
+                <label style="color:red" value="@load(vmsgs['apellidos'])" />
+                <!--<label style="color:red" value="@load(vmsgs['fecha_alta'])" />-->
+                <label style="color:red" value="@load(vmsgs['direccion'])" />
+                <label style="color:red" value="@load(vmsgs['ciudad'])" />
+                <label style="color:red" value="@load(vmsgs['provincia'])" />
+                <label style="color:red" value="@load(vmsgs['telefono'])" />
+                <label style="color:red" value="@load(vmsgs['telefono2'])" />
+                <label style="color:red" value="@load(vmsgs['email'])" />
+            </hlayout>
+        </groupbox>
+    </window>
+</zk>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" title="Pedidos" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.pedidos.PedidoViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+            <!--boolean disabled = true;-->
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+                    
+                    win.setVisible(true);
+                }
+        
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <div><include src="../${menu}"/></div>
+        <!--<div width="750px" height="453px"></div>--> 
+        <menubar id="menu" >
+            <menuitem id="add" 
+                      image="../images/nuevo.png" 
+                      label="Nuevo" 
+                      onClick="@command('add')" 
+                      tooltiptext="Nuevo"
+                      disabled="@load(empty vm.selectedProveedor)"/>
+            <menuseparator />
+            <menuitem id="delete"  image="../images/delete.png" label="Eliminar"  disabled="@load(empty vm.selectedEvent)" tooltiptext="Eliminar">
+                <attribute name="onClick">
+                    <![CDATA[
+                        Messagebox.show("¿Desea elimimar " + vm.selectedEvent.getId() + " ?", 
+                        "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                            new org.zkoss.zk.ui.event.EventListener(){
+                                public void onEvent(Event e){
+                                    if(Messagebox.ON_OK.equals(e.getName())){
+                                        vm.delete();
+                                        Executions.sendRedirect("pedido-template.zul");
+                                    }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                        delete.setDisabled(true);
+                                    }
+                                }
+                            }
+                        );
+                    ]]>
+                </attribute>
+            </menuitem>
+        </menubar>
+        <groupbox id="mygrp" closable="false"
+                  form="@id('zk_pedido') 
+                        @load(vm.selectedProveedor) 
+                        @save(vm.selectedProveedor, before='update') 
+                        @save(vm.newEvent, before='add')">
+            <!--<caption label="Venta Nueva" />-->
+            <div style="margin-bottom:10px; margin-top: 10px">
+                Proveedor: <bandbox id="bnxProveedor"  
+                                   autodrop="false" 
+                                   cols="25"  
+                                   value="@bind(vm.selectedProveedor.nombre)"   
+                                   disabled="@load(not empty vm.selectedProveedor)"
+                                   readonly="true"
+                                   constraint="no empty">
+                            <attribute name="onOpen">
+                                <![CDATA[
+                                    import java.util.HashMap;
+                                    import org.zkoss.zk.ui.Component;
+                                    import org.zkoss.zk.ui.Executions;
+                                    //Map map = new HashMap();
+                                    //map.put("selectedProveedor", vm.selectedProveedor);
+                                    Executions.createComponents("pedido-buscarproveedor.zul", null, null);
+                                ]]>
+                            </attribute>
+                        </bandbox>
+
+            </div>
+        </groupbox>
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="13" 
+                 rows="13" 
+                 multiple="true" 
+                 model="@bind(vm.pedidos)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ningún ítem encontrado">
+            <listhead>
+                <listheader label="Número"          sort="auto(id)" width="80px" align="center"/>
+                <listheader label="Fecha"           sort="auto(fecha)"          align="center" />
+                <listheader label="Fecha entrega"   sort="auto(fecha_entrega)"  align="center" />
+                <listheader label="Fecha pago"      sort="auto(fecha_pago)"     align="center" />
+                <listheader label="Proveedor"       sort="auto(proveedor.nombre)" />
+                <listheader label="Pagado"          sort="auto(pagado)" width="80px" align="center" />
+                <listheader label="Empleado"        sort="auto(empleado.nombre)"/>
+                <listheader label="N. Artículos"    sort="auto(num_articulos)" width="80px" align="right" />
+                <listheader label="Coste total"     sort="auto(coste)" align="right" />
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterId)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFecha)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaEntrega)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaPago)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProveedor)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterPagado)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%" />
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_pedido">
+                <listitem value="@load(zk_pedido)" onDoubleClick="@command('showPedidoLinea')">
+                    <listcell label="@load(zk_pedido.id)" context="${zk_pedido.id}">
+                        <menupopup id="${zk_pedido.id}">
+                            <menuitem label="Ir a" 
+                                      src="/images/page_go.png"    
+                                      onClick="@command('showPedidoLinea')" />
+                            <menu label="Pagado" src="/images/money_euro.png">
+                                <menupopup>
+                                    <menuitem label="Pagado"   
+                                              src="/images/accept.png"    
+                                              onClick="@command('pagado')"/>
+                                    <menuitem label="Sin pagar" 
+                                              src="/images/error.png"     
+                                              onClick="@command('sinpagar')" />
+                                </menupopup>
+                            </menu>
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_pedido.fecha) @converter('formatedDate', format='yyyy-MM-dd')" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.fecha_entrega) @converter('formatedDate', format='yyyy-MM-dd')" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.fecha_pago) @converter('formatedDate', format='yyyy-MM-dd')" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.proveedor.nombre)" context="${zk_pedido.id}"/>
+                    <listcell context="${zk_pedido.id}">
+                        <checkbox label="@load(zk_pedido.pagado ? 'Si' : 'No')" 
+                                  checked="@bind(zk_pedido.pagado)" 
+                                  disabled="true" 
+                                  />
+                    </listcell>
+                    <listcell label="@load(zk_pedido.empleado.nombre)" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.num_articulos)" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.coste) @converter('formatedNumber', format='#,##0.00 €')" context="${zk_pedido.id}"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

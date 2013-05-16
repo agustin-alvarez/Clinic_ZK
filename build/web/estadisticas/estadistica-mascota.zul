@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window id="winestadisticamascota" title="Estadísticas Mascotas" border="normal" height="650px"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.estadisticas.EstadisticosMascVM')" visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1){
+                        menu = "menu-admin.zul";
+                    }
+                    winestadisticamascota.setVisible(true);
+                    
+                }
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <div><include src="../${menu}"/></div>
+        
+        <!--  Para que cambie el año, hay que darle a [Intro] o pinchar fuera y luego darle a [Buscar] -->
+        
+        <groupbox id="mygrp" closable="false">
+            <div style="margin-bottom:10px; margin-top: 10px">
+                <label value="Año: " /> 
+                <textbox 
+                        id="bnxYear"
+                        onOK="@command('year')"
+                        value="@bind(vm.selectedYear)"
+                        cols="25"
+                        constraint="/^19[0-9]{2}|2[0-9]{3}$/: Debe introducir un año desde 1900 a 2999"
+                        focus="true"
+                />
+                <button id="btnBuscar" label="Buscar" onClick="@command('year')"/>
+            </div>
+        </groupbox>
+        <grid model="@load(vm.events)">
+            <auxhead>
+                <auxheader label="" />
+                <auxheader label="Q1" colspan="3" />
+                <auxheader label="Q2" colspan="3" />
+                <auxheader label="Q3" colspan="3" />
+                <auxheader label="Q4" colspan="3" />
+            </auxhead>
+            <columns>
+                <column label="Tipo"/>
+                <column label="Enero"/>
+                <column label="Febrero"/>
+                <column label="Marzo"/>
+                <column label="Abril"/>
+                <column label="Mayo"/>
+                <column label="Junio"/>
+                <column label="Julio"/>
+                <column label="Agosto"/>
+                <column label="Septiembre"/>
+                <column label="Octubre"/>
+                <column label="Noviembre"/>
+                <column label="Diciembre"/>
+            </columns>
+            <template name="model" var="item" >
+                <row>
+                    <label value="@bind(item.tipo)"/>
+                    <label value="@bind(item.enero)"/>
+                    <label value="@bind(item.febrero)"/>
+                    <label value="@bind(item.marzo)"/>
+                    <label value="@bind(item.abril)"/>
+                    <label value="@bind(item.mayo)"/>
+                    <label value="@bind(item.junio)"/>
+                    <label value="@bind(item.julio)"/>
+                    <label value="@bind(item.agosto)"/>
+                    <label value="@bind(item.septiembre)"/>
+                    <label value="@bind(item.octubre)"/>
+                    <label value="@bind(item.noviembre)"/>
+                    <label value="@bind(item.diciembre)"/>
+                </row>
+            </template>
+        </grid>
+        <zhighcharts id="chart"
+                    model="@load(vm.grafica)"
+                    type="line"
+                    width="800px"
+                    height="300px"
+                    style="font-weight:bold; float: left" 
+        />
+        <zscript><![CDATA[            
+            chart.setTitle("Gráfica de Mascotas");
+            chart.setLegend("{" +
+                                "layout: 'vertical'," +
+                                "align: 'right'," +
+                                "verticalAlign: 'top'," +
+                                "x: -10," +
+                                "y: 100," +
+                                "borderWidth: 0" +
+                            "}");
+            chart.setxAxisOptions("{" +
+					"categories: [" +
+						"'Ene', " +
+						"'Feb', " +
+						"'Mar', " +
+						"'Abr', " +
+						"'May', " +
+						"'Jun', " +
+						"'Jul', " +
+						"'Ago', " +
+						"'Sep', " +
+						"'Oct', " +
+						"'Nov', " +
+						"'Dic'" +
+					"]" +
+				"}");
+            chart.setPlotOptions("{" +
+				"series:{" +
+					"dataLabels:{" +
+						"formatter: function (){return this.y;}," + 
+						"enabled: true" +
+					"}" +
+				"}" +
+			"}");
+            ]]>
+        </zscript>
+    </window>
+</zk>

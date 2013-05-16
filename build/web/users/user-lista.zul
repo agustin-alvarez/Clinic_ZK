@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" title="Usuarios" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.user.UserViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+      <zscript>
+          <![CDATA[
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+            Session s = Sessions.getCurrent();
+            boolean desactivado = true;
+                
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1){ //Si es admin
+                        win.setVisible(true);
+                    }
+                    else
+                        Executions.sendRedirect("../principal.zul");
+                    
+                }
+                ]]>
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <div>
+            <include src="../menu-admin.zul"/>
+        </div>
+        <menubar id="menu" >
+            <menuitem id="add" image="../images/nuevo.png" label="Nuevo" onClick="@command('nuevoUsuario')" tooltiptext="Nuevo"/>
+            <menuseparator />
+            <menuitem id="activar" 
+                      image="../images/modificar.png"   
+                      label="Modificar"   
+                      disabled="@load(empty vm.selectedEvent)" 
+                      tooltiptext="Activar">
+                <attribute name="onClick">
+                    if(desactivado){
+                        desactivado = false;
+                        delete.setDisabled(desactivado);
+                    }
+                    else{
+                        desactivado = true;
+                        delete.setDisabled(desactivado);
+                    }
+                </attribute>
+            </menuitem>
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar" 
+                      disabled="${desactivado}" 
+                      tooltiptext="Eliminar">
+                <attribute name="onClick">
+                    <![CDATA[
+                        if(vm.selectedEvent.getTipo() == 1){
+                            Messagebox.show("No se puede eliminar un Administrador", "Warning", Messagebox.OK, Messagebox.EXCLAMATION);
+                        }
+                        else{
+                                Messagebox.show("¿Desea elimimar " + vm.selectedEvent.getNombre() + " ?", 
+                                "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                                    new org.zkoss.zk.ui.event.EventListener(){
+                                        public void onEvent(Event e){
+                                            if(Messagebox.ON_OK.equals(e.getName())){
+                                                vm.delete();
+                                                Executions.sendRedirect("user-lista.zul");
+                                            }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                                delete.setDisabled(true);
+                                            }
+                                        }
+                                    }
+                                );
+                            }
+                    ]]>
+                </attribute>
+            </menuitem>
+            <zscript>
+                    Activar() {
+                        if(vm.selectedEvent != null){
+                            delete.setDisabled(false);
+                        }
+                    }
+            </zscript>
+        </menubar>
+        <!--<div width="750px" height="453px"></div>-->
+        
+        <listbox id="box" 
+                 mold="paging"
+                 rows="14"
+                 pageSize="14" 
+                 model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <listheader label="Usuario"     sort="auto(user)" />
+                <listheader label="Nombre"      sort="auto(nombre)" />
+                <listheader label="Apellidos"   sort="auto(apellidos)" />
+                <listheader label="NIF"         sort="auto(nif)"/>
+                <listheader label="Rol"         sort="auto(tipo)" />
+                <listheader label="Dirección"   sort="auto(direccion)" />
+                <listheader label="Población"   sort="auto(poblacion)" />
+                <listheader label="Provincia"   sort="auto(provincia)" />
+                <listheader label="Teléfono"    sort="auto(telefono)" />
+                <listheader label="Móvil"       sort="auto(movl)" />
+                <listheader label="Email"       sort="auto(email)" />
+                <listheader label="NSS"         sort="auto(nss)" />
+                <listheader label="Fecha Alta"  sort="auto(fecha_alta)" />
+            </listhead>
+            <template name="model" var="zk_user">
+                <listitem value="@load(zk_user)" onDoubleClick="@command('modificarUsuario')">
+                    <listcell label="@load(zk_user.user)" />
+                    <listcell label="@load(zk_user.nombre)" />
+                    <listcell label="@load(zk_user.apellidos)" />
+                    <listcell label="@load(zk_user.nif)" />
+                    <listcell label="Administrador" if="${zk_user.tipo == '1'}" />
+                    <listcell label="Veterinario"   if="${zk_user.tipo == '2'}" />
+                    <listcell label="Empleado"      if="${zk_user.tipo == '3'}" />
+                    <listcell label="@load(zk_user.direccion)" />
+                    <listcell label="@load(zk_user.poblacion.poblacion)" />
+                    <listcell label="@load(zk_user.provincia.provincia)" />
+                    <listcell label="@load(zk_user.telefono)" if="${zk_user.telefono != '0'}"/>
+                    <listcell label=""         if="${zk_user.telefono == '0'}" />
+                    <listcell label="@load(zk_user.movil)" if="${zk_user.movil != '0'}"/>
+                    <listcell label=""         if="${zk_user.movil == '0'}" />
+                    <listcell label="@load(zk_user.email)" />
+                    <listcell label="@load(zk_user.nss)" />
+                    <listcell label="@load(zk_user.fecha_alta)" />
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

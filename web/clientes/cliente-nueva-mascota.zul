@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win-asig-masc" title="Asignar mascota" border="normal"
+            width="600px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.clientes.ClienteMascotaVM')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="add" label="Guardar" image="../images/guardar.png"  onClick="@command('sendmascota')" 
+                      autodisable="+self, +txtChip, +txtNombre, +dateNac, +doublePeso, +doubleAltura, +cmbEspecie, +cmbRaza, +txtPelo, +txtSexo"/>
+        </menubar>
+  
+        <grid id="mygrp"
+              form="@id('zk_mascota') @load(vm.selectedEvent)
+                    @save(vm.newEvent, before='sendmascota') ">
+            <columns>
+                <column label="Datos Mascota" width="150px" />
+                <column label="" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="Nº Chip *" width="150px" />
+                    <textbox id="txtChip" cols="25" value="@save(zk_mascota.chip)" width="200px" constraint="no empty"/>
+                </row>
+                <row>
+                    <label value="Nombre *" width="150px" />
+                    <textbox id="txtNombre" cols="25" value="@save(zk_mascota.nombre)" width="200px" constraint="no empty"/>
+                </row>
+                <row>
+                    <label value="Fecha nacimiento *" width="150px" />
+                    <hlayout>
+                        <datebox id="dateNac" format="dd/MM/yyyy" width="200px" value="@save(zk_mascota.nacimiento)"/>
+                    </hlayout>
+                </row>
+                <row>
+                    <label value="Sexo *" width="150px" />
+                    <listbox id="txtSexo" rows="1" mold="select" selectedItem="@save(zk_mascota.sexo)" width="205px">
+                        <listitem label="Macho" value="Macho" />
+                        <listitem label="Hembra" value="Hembra" />
+                    </listbox>
+                </row>
+                <row>
+                    <label value="Peso (kg)" width="150px" />
+                    <doublebox id="doublePeso" cols="25" value="@save(zk_mascota.peso)" width="200px" />
+                </row>
+                <row>
+                    <label value="Altura (cm)" width="150px" />
+                    <doublebox id="doubleAltura"  cols="25" value="@save(zk_mascota.altura)" width="200px" />
+                </row>
+                <row>
+                    <label value="Especie *" width="150px" />
+                    <selectbox id="cmbEspecie" 
+                               model="@load(vm.especies)" 
+                               selectedItem="@bind(vm.selectedEspecie) @save(zk_mascota.especie)"  
+                               onSelect="@command('onSelectEspecie')" 
+                               width="205px">
+                        <template name="model">
+                            <label value="@load(each.especie)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Raza *" width="150px" />
+                    <selectbox id="cmbRaza" 
+                               model="@load(vm.allRazas)" 
+                               selectedItem="@save(zk_mascota.raza)"  
+                               width="205px" >
+                        <template name="model">
+                            <label value="@load(each.raza)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Pelo:" width="150px" />
+                    <listbox id="txtPelo" rows="1" mold="select" selectedItem="@save(zk_mascota.pelo)" width="205px">
+                        <listitem label="Corto" value="Corto" />
+                        <listitem label="Largo" value="Largo" />
+                        <listitem label="Duro"  value="Duro" />
+                        <listitem label="Medio" value="Medio" />
+                        <listitem label="Medio-largo" value="Medio-largo" />
+                        <listitem label="Propio" value="Propio" />
+                        <listitem label="Rizado" value="Rizado" />
+                    </listbox>
+                </row>
+                <row>
+                    Observaciones:
+                    <hlayout>
+                        <textbox id="txtObs" rows="3" width="250px" value="@save(zk_mascota.observ)"/>
+                    </hlayout>
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

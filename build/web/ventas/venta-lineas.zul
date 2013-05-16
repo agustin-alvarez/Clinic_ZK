@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winventalinea" title="Línea de Venta" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.ventas_linea.VentaLineaViewModel')"
+            validationMessages="@id('vmsgs')"  visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+
+                    winventalinea.setVisible(true);
+                }
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <div><include src="../${menu}"/></div>
+        <menubar id="menu" >
+            <menuitem image="../images/goback.png"
+                      onClick='Executions.sendRedirect("../ventas/venta-template.zul")'
+                      label="Atrás"/>
+            <menuitem label="Generar Albarán"
+                      image="../images/page_white_text.png"
+                      onClick="@command('crearAlbaran')"
+                      disabled="@load(empty vm.selectedVenta)"/>
+            <menuitem id="delete"
+                      image="../images/delete.png"
+                      label="Eliminar"
+                      onClick="@command('delete')"
+                      disabled="@load(empty vm.selectedEvent)" />
+<!--                <attribute name="onClick">
+                    <![CDATA[
+                        Messagebox.show("¿Desea elimimar " + vm.selectedEvent.getProducto().getId(); + " ?",
+                        "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                            new org.zkoss.zk.ui.event.EventListener(){
+                                public void onEvent(Event e){
+                                    if(Messagebox.ON_OK.equals(e.getName())){
+                                        vm.delete();
+                                        //Executions.sendRedirect("pedido-lista.zul");
+                                        vm.showPedidoLinea();
+                                    }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                        Desactivar();
+                                    }
+                                }
+                            }
+                        );
+                    ]]>
+                </attribute>
+            </menuitem>-->
+            <zscript>
+                    Activar() {
+                        update.setReadonly(false);
+                        delete.setReadonly(false);
+                    }
+
+                    Desactivar() {
+                        update.setReadonly(true);
+                        delete.setReadonly(true);
+                    }
+            </zscript>
+        </menubar>
+        <!--<div width="750px" height="453px"></div>-->
+        <groupbox id="grpcli" form="@id('zk_venta') @load(vm.selectedVenta)" closable="false">
+            <caption label="Venta Descripción" />
+            <div style="margin-bottom:10px">
+                Número:
+                <intbox cols="20"
+                        value="@bind(vm.selectedEvent.venta.cliente.nombre ? vm.selectedEvent.venta.id : vm.selectedVenta.id)"
+                        style="margin-right: 15px"
+                        readonly="true" />
+                Cliente:
+                <bandbox id="bnxCliente"
+                         autodrop="false"
+                         cols="25"
+                         width="220px"
+                         value="@bind(vm.selectedEvent.venta.cliente.nombre ? vm.selectedEvent.venta.cliente.fullname : vm.selectedVenta.cliente.fullname)"
+                         constraint="no empty"
+                         style="margin-right: 10px"
+                         readonly="true">
+                    <attribute name="onOpen">
+                        <![CDATA[
+                            import java.util.HashMap;
+                            import org.zkoss.zk.ui.Component;
+                            import org.zkoss.zk.ui.Executions;
+                            //Map map = new HashMap();
+                            //map.put("selectedVenta", vm.selectedVenta);
+                            Executions.createComponents("venta-buscarcliente.zul", null, null);
+                        ]]>
+                    </attribute>
+                </bandbox>
+<!--                            <attribute name="onOpen">
+                                <![CDATA[
+                                    import java.util.HashMap;
+                                    import org.zkoss.zk.ui.Component;
+                                    import org.zkoss.zk.ui.Executions;
+                                    Map map = new HashMap();
+                                    map.put("selectedVenta", vm.selectedVenta);
+                                    Executions.createComponents("venta-buscarcliente.zul", null, map);
+                                ]]>
+                            </attribute>
+                        </bandbox>-->
+                Fecha:
+                    <datebox cols="20"
+                         value="@bind(vm.selectedEvent.venta.cliente.nombre ? vm.selectedEvent.venta.fecha : vm.selectedVenta.fecha)"
+                         style="margin-right:15px;"
+                         disabled="true" />
+                    
+                    <label value="Veterinario: "/>
+                    <selectbox id="cmbVet"
+                               model="@load(vm.veterinarios)"
+                               selectedItem="@bind(vm.selectedVet)"
+                               onSelect="@command('updateVet')"
+                               width="220px"
+                               visible="@load(empty vm.selectedVet)">
+                      <template name="model">
+                          <label value="@load(each.nombre)" />
+                      </template>
+                    </selectbox>
+                    <textbox cols="20"
+                             value="@load(vm.selectedVet.nombre)"
+                             visible="@load(not empty vm.selectedVet)"
+                             readonly="true"/>
+            </div>
+        </groupbox>
+        <listbox id="box"
+                 mold="paging"
+                 pageSize="11"
+                 rows="11"
+                 multiple="true"
+                 model="@load(vm.ventalineas)"
+                 selectedItem="@bind(vm.selectedEvent)" >
+            <listhead>
+                <listheader label="Código"      sort="auto(codigo)" width="100px"/>
+                <listheader label="Nombre"      sort="auto(nombre)" />
+                <listheader label="Tipo"        sort="auto(tipo)" />
+                <listheader label="Descripción" sort="auto(descripcion)" />
+                <listheader label="Cantidad"    sort="auto(cantidad)"           width="100px" align="right"/>
+                <listheader label="PVP"         sort="auto(pvp)"    width="100px" align="right"/>
+                <listheader label="IVA"         sort="auto(iva)"    width="100px" align="center"/>
+                <listheader label="Precio total"   width="120px" align="right" />
+            </listhead>
+            <template name="model" var="zk_ventalinea">
+                <listitem value="@load(zk_ventalinea)">
+                    <listcell label="@load(zk_ventalinea.codigo)" />
+                    <listcell label="@load(zk_ventalinea.nombre)" />
+                    <listcell label="Producto" src="../images/tag_blue.png" if="${zk_ventalinea.tipo == 1}"/>
+                    <listcell label="Servicio" src="../images/brick.png" if="${zk_ventalinea.tipo == 2}"/>
+                    <listcell label="@load(zk_ventalinea.descripcion)"
+                              if="${zk_ventalinea.descripcion != 'null'}"/>
+                    <listcell label=""
+                              if="${zk_ventalinea.descripcion == 'null'}"/>
+                    <listcell label="@load(zk_ventalinea.cantidad)" />
+                    <listcell label="@load(zk_ventalinea.pvp) @converter('formatedNumber', format='#,##0.00 €')" />
+                    <listcell label="@load(zk_ventalinea.iva)" />
+                    <listcell label="@load(zk_ventalinea.preciototal) @converter('formatedNumber', format='#,##0.00 €')"/>
+                </listitem>
+            </template>
+        </listbox>
+        <hbox height="100px" style="float: right">
+<!--        <groupbox id="grpmasc" form="@id('zk_ventalinea') @bind(vm.selectedEvent)" closable="false">-->
+            <groupbox form="@id('zk_ventalinea') 
+                            @load(vm.selectedEvent)
+                            @save(vm.selectedEvent, before='update')
+                            @save(vm.newEvent, before='add')"
+                      closable="false"
+                      width="210px"
+                      style="float:left">
+                <caption label="Servicio" />
+                <div style="margin-bottom:10px" width="200px">
+                    Código:
+                    <bandbox autodrop="false"
+                             cols="16"
+                             value="@bind(vm.selectedEvent.servicio.codigo)"
+                             style="margin-left:11px; margin-right: 10px"
+                             readonly="true" >
+                       <attribute name="onOpen">
+                           <![CDATA[
+                               import java.util.HashMap;
+                               import org.zkoss.zk.ui.Component;
+                               import org.zkoss.zk.ui.Executions;
+                               Map map = new HashMap();
+                               map.put("selectedVenta", vm.selectedVenta);
+                               Executions.createComponents("venta-buscarservicio.zul", null, map);
+                           ]]>
+                       </attribute>
+                   </bandbox>
+
+                    Nombre:
+                    <textbox cols="18" width="122px"
+                             value="@bind(vm.selectedEvent.servicio.nombre)"
+                             style="margin-left: 8px; padding-top 10px;"
+                             readonly="true"/>
+                </div>
+            </groupbox>
+            <groupbox form="@id('zk_ventalinea') 
+                            @load(vm.selectedEvent)
+                            @save(vm.selectedEvent, before='update')
+                            @save(vm.newEvent, before='add')"
+                      closable="false"
+                      width="210px"
+                      style="float:left; margin-left: 20px">
+                <caption label="Producto" />
+                <div style="margin-bottom:10px" width="200px">
+                    Código: <bandbox autodrop="false"
+                                     cols="16"
+                                     value="@bind(vm.selectedEvent.producto.codigo)"
+                                     style="margin-left:11px; margin-right: 10px"
+                                     readonly="true" >
+                                <attribute name="onOpen">
+                                    <![CDATA[
+                                        import java.util.HashMap;
+                                        import org.zkoss.zk.ui.Component;
+                                        import org.zkoss.zk.ui.Executions;
+                                        Map map = new HashMap();
+                                        map.put("selectedVenta", vm.selectedVenta);
+                                        Executions.createComponents("venta-buscarproducto.zul", null, map);
+                                    ]]>
+                                </attribute>
+                            </bandbox>
+
+                    Nombre:
+                    <textbox cols="18" width="122px"
+                             value="@bind(vm.selectedEvent.producto.nombre)"
+                             style="margin-left: 8px; padding-top 10px;"
+                             readonly="true"/>
+                </div>
+
+            </groupbox>
+            <groupbox form="@id('zk_ventalinea') @load(vm.selectedEvent)
+                            @save(vm.selectedEvent, before='update')"
+                      closable="false"
+                      width="210px"
+                      style="float:left; margin-top: 5px; margin-left: 20px" >
+                <div>
+                    <div style="margin-right: 10px; margin-top: 5px">
+                        <label value="Cantidad:" />
+                        <intbox  cols="15"
+                                 value="@bind(zk_ventalinea.cantidad)"
+                                 style="margin-left: 2px; margin-right: 15px"
+                                 constraint="no empty, no negative, no zero"
+                                 onChange="@command('update')"
+                                 onOK="@command('update')"/>
+                     </div>
+                     <div style="margin-right: 10px; margin-top: 5px">
+                        <label value="Precio:" style="margin-right: 15px; margin-top: 5px"/>
+                        <doublebox  cols="15"
+                                    value="@bind(zk_ventalinea.pvp)"
+                                    format="#,##0.##"
+                                    onChange="@command('update')"
+                                    onOK="@command('update')"/>
+                     </div>
+                     <div style="margin-right: 10px; margin-top: 5px">
+                        <label value="IVA:" style="margin-right: 25px;"/>
+                        <intbox  cols="15"
+                                 value="@bind(zk_ventalinea.iva)"
+                                 style="margin-left: 9px;"
+                                 onChange="@command('update')"
+                                 onOK="@command('update')"/>
+                     </div>
+                </div>
+            </groupbox>
+            <groupbox closable="false"
+                      width="260px"
+                      height="90px"
+                      style="float:right; 
+                             margin-top: 5px; 
+                             margin-left: 20px; vertical-align: middle" >
+                <label value="Total:" 
+                       style="font-size: 30px; 
+                              margin-top: 20px;"/>
+                <doublebox value="@load(vm.costeventalineas)" 
+                           format="#,##0.## €"
+                           width="150px"
+                           readonly="true" 
+                           style="font-size: 20px; 
+                                  float: right; 
+                                  text-align: right;"/>
+            </groupbox>
+        </hbox>
+    </window>
+</zk>

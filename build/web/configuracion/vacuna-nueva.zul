@@ -1,0 +1,87 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winvacunanueva" title="Vacuna Nueva" border="normal"
+            width="610px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.vacunas.VacunaViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="add"    image="/images/nuevo.png"   label="Nuevo"     onClick="@command('add')"    tooltiptext="Nuevo"/>
+            <menuitem id="update" image="/images/guardar.png" label="Modificar" onClick="@command('update')" disabled="true" tooltiptext="Modificar" />
+        </menubar>
+        <style src="../estilos/listbox20h.css" />
+        <listbox id="box" mold="paging" pageSize="10" multiple="true" rows="10" model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <listheader label="Vacuna"  sort="auto(nombre)" />
+                <listheader label="Días"    sort="auto(dias)"               width="70px"    align="center"/>
+                <listheader label="Especie" sort="auto(especie.especie)"    width="120px"   align="center"/>
+                <listheader label="Descripción"   sort="auto(descripcion)"/>
+            </listhead>
+            <template name="model" var="zk_raza">
+                <listitem value="@load(zk_raza)">
+                    <listcell label="@load(zk_raza.nombre)" />
+                    <listcell label="@load(zk_raza.dias)" />
+                    <listcell label="@load(zk_raza.especie.especie) " />
+                    <listcell label="@load(zk_raza.descripcion)" />
+                </listitem>
+            </template>
+        </listbox>
+        <groupbox id="mygrp"
+                  form="@id('zk_raza') 
+                        @load(vm.selectedEvent) 
+                        @save(vm.selectedEvent, before='update') 
+                        @save(vm.newEvent, before='add') " 
+                  closable="false">
+            <caption label="Vacuna Nueva" />
+            <div style="margin-top:5px; float: left">
+                <div style=" margin-bottom:10px">
+                    <label value="Especie *:" style="float:left; margin-right: 10px;"/>
+                    
+                    <selectbox id="cmbEspecie" 
+                               model="@load(vm.especies)" 
+                               selectedItem="@save(zk_raza.especie)"  
+                               width="150px" 
+                               
+                    >
+                        <attribute name="onSelect">
+                            update.setDisabled(false);
+                        </attribute>
+                        <template name="model">
+                            <label value="@bind(each.especie)" />
+                        </template>
+                    </selectbox>
+                </div>
+                <div>
+                    <label value="Vacuna *:" style="float:left; margin-right: 2px;"/> 
+                    <textbox id="txtVacuna"   
+                             cols="24" 
+                             value="@bind(zk_raza.nombre)" 
+                             constraint="no empty"
+                             style="margin-left: 10px; margin-right:15px" onChanging="update.setDisabled(false)"/>
+                </div>
+                <div style="margin-top:10px">
+                    <label value="Días *:" style="float:left; margin-right: 16px;"/> 
+                    <intbox id="intDias"   
+                            cols="24" 
+                            value="@bind(zk_raza.dias)" 
+                            constraint="no empty"
+                            style="margin-left: 10px; margin-right:15px" 
+                            onChanging="update.setDisabled(false)" />
+                </div>
+                
+            </div>
+            <div style="margin-top:5px; float: left">
+                    <label value="Descripción: " style="float:left; margin-right: 2px;"/> 
+                    <textbox id="txtDescripcion"  
+                             rows="5" 
+                             cols="24"
+                             width="240px"
+                             value="@bind(zk_raza.descripcion)" 
+                             style="margin-left: 10px; margin-right:15px" 
+                             onChanging="update.setDisabled(false)" />
+            </div>
+        </groupbox>
+    </window>
+</zk>

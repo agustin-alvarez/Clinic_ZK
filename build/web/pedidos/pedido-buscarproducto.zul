@@ -1,0 +1,76 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winbuscarproducto" title="Productos" border="normal"
+            width="800px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            onCancel="winbuscarproducto.detach()"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.productos.ProductoViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="send"  
+                      image="/images/check_box.png"  
+                      label="Confirmar"  
+                      disabled="@load(empty vm.selectedItems)" 
+                      tooltiptext="Confirmar">
+                <attribute name="onClick">
+                    vm.send(); 
+                    winbuscarproducto.detach();
+                </attribute>
+            </menuitem>
+        </menubar>
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="8" 
+                 multiple="true" 
+                 rows="8"
+                 checkmark="true"
+                 model="@bind(vm.prodprov)" 
+                 selectedItems="@bind(vm.selectedItems)">
+            <listhead>
+                <listheader label="Código"      sort="auto(codigo)"/>
+                <listheader label="Nombre"      sort="auto(nombre)" />
+                <listheader label="Proveedor"   sort="auto(proveedor.nombre)" />
+                <listheader label="Familia"     sort="auto(familia)" />
+                <listheader label="PVP"         sort="auto(pvp)"    width="80px" align="right"/>
+                <listheader label="Precio"      sort="auto(precio)" width="80px" align="right"/>
+                <listheader label="Stock"       sort="auto(stock)"  width="80px" align="right"/>
+            </listhead>
+<!--            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCodigo)" instant="true" onChange="@command('doSearchProv')" width="100px" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearchProv')" width="100px" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProveedor)" instant="true" onChange="@command('doSearchProv')" width="100px" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFamilia)" instant="true" onChange="@command('doSearchProv')" width="100px" />
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>-->
+            <template name="model" var="zk_producto">
+                <listitem value="@load(zk_producto)">
+                    <listcell label="@load(zk_producto.codigo)" />
+                    <listcell label="@load(zk_producto.nombre)" />
+                    <listcell label="@load(zk_producto.proveedor.nombre)" />
+                    <listcell label="@load(zk_producto.familia.nombre)" />
+                    <listcell label="@load(zk_producto.pvp)" />
+                    <listcell label="@load(zk_producto.precio)"  />
+                    <listcell label="@load(zk_producto.stock)" />
+                </listitem>
+            </template>
+            <!--            <zscript>
+		void doOk() {
+                    Messagebox.show("ENTER key is pressed", "OK", Messagebox.OK, Messagebox.EXCLAMATION);
+                    inp.focus();
+		}
+                
+            </zscript>-->
+        </listbox>
+    </window>
+</zk>

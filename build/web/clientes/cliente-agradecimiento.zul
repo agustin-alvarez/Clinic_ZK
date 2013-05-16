@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" title="Cliente Nuevo" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.clientes.ClienteViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+                    
+                    win.setVisible(true);
+                }
+        
+        </zscript>
+        <div><include src="../${menu}"/></div>
+        <menubar id="menu" >
+            <menuitem id="update" image="../images/guardar.png" label="Guardar" onClick="@command('update')" tooltiptext="Guardar"/>
+        </menubar>
+        <!--<ckeditor id="ed" width="720px" customConfigurationsPath="/clientes/config.js"/>-->
+        <textbox rows="15" cols="140"/>
+    </window>
+</zk>

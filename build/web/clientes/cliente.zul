@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" title="Perfil Cliente" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.clientes.ClienteDatosVM')"
+            visible="false">
+        <zscript>
+            <![CDATA[
+                import org.zkoss.zk.ui.*;
+                import es.clinica.veterinaria.user.*;
+
+                Session s = Sessions.getCurrent();
+                String menu = "menu.zul";
+                boolean mod = false;
+                String image = "../images/modificar.png";
+                String modificar = "Modificar";
+                
+                void logout() {
+                    s.invalidate();
+                    Executions.sendRedirect("../index.zul");
+                }
+
+                if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                    Executions.sendRedirect("../index.zul");
+                else{
+                        if(UserCredentialManager.getIntance(session).getRol() == 1)
+                            menu = "menu-admin.zul";
+
+                        win.setVisible(true);
+                    }
+            ]]>
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <div><include src="../${menu}"/></div>
+        <tabbox id="tabBoxCustomer" width="100%" >
+            <tabs>
+                <tab id="tabDatos" label="Datos" />
+                <tab id="tabMascotas" label="Mascotas" />
+                <tab id="tabCitas" label="Citas" />
+                <tab id="tabVentas" label="Ventas" />
+            </tabs>
+            <tabpanels>
+                <tabpanel id="datosCliente" height="550px"
+                          form="@id('zk_cliente') @load(vm.selectedEvent) 
+                                @save(vm.selectedEvent, before='update')">
+                    <menubar id="menuCli" >
+                        <menuitem id="modificarDatos" label="Modificar" image="../images/modificar.png">
+                            <attribute name="onClick">
+                                <![CDATA[
+                                    if(updateDatos.isDisabled()){
+                                        updateDatos.setDisabled(false);
+                                    }
+                                    else{
+                                        updateDatos.setDisabled(true);
+                                    }
+                                        
+                                    txtEmail.setReadonly(mod);
+                                    intTelefono.setReadonly(mod);
+                                    intTelefono2.setReadonly(mod);
+                                    self.setVisible(false);
+                                    cancelarDatos.setVisible(true);
+                                    if(!mod){
+                                        mod = true;
+                                        Direccion.setVisible(false);
+                                        DireccionMod.setVisible(true);
+                                    }
+                                    else{
+                                        mod = false;
+                                        Direccion.setVisible(true);
+                                        DireccionMod.setVisible(false);
+                                    }
+                                ]]>
+                            </attribute>
+                        </menuitem>
+                        <menuitem id="cancelarDatos" label="Cancelar" onClick="@command('cancelar')" image="../images/delete_1.png" visible="false">
+                            <attribute name="onClick">
+                                <![CDATA[
+                                    if(updateDatos.isDisabled()){
+                                        updateDatos.setDisabled(false);
+                                    }
+                                    else{
+                                        updateDatos.setDisabled(true);
+                                    }
+                                        
+                                    txtEmail.setReadonly(mod);
+                                    intTelefono.setReadonly(mod);
+                                    intTelefono2.setReadonly(mod);
+                                    self.setVisible(false);
+                                    modificarDatos.setVisible(true);
+                                    if(!mod){
+                                        mod = true;
+                                        Direccion.setVisible(false);
+                                        DireccionMod.setVisible(true);
+                                        
+                                    }
+                                    else{
+                                        mod = false;
+                                        Direccion.setVisible(true);
+                                        DireccionMod.setVisible(false);
+                                    }
+                                ]]>
+                            </attribute>
+                        </menuitem>
+                        <menuitem id="updateDatos"  
+                                  label="Guardar" 
+                                  image="../images/guardar.png"  
+                                  onClick="@command('update')" 
+                                  disabled="true"
+                                  autodisable="+self">
+                                  <attribute name="onClick">
+                                      <![CDATA[
+                                        txtEmail.setReadonly(true);
+                                        intTelefono.setReadonly(true);
+                                        intTelefono2.setReadonly(true);
+                                        
+                                        if(!mod){
+                                            mod = true;
+                                            Direccion.setVisible(false);
+                                            DireccionMod.setVisible(true);
+                                        }
+                                        else{
+                                            mod = false;
+                                            Direccion.setVisible(true);
+                                            DireccionMod.setVisible(false);
+                                            cancelarDatos.setVisible(false);
+                                            modificarDatos.setVisible(true);
+                                        }
+                                      ]]>
+                                  </attribute>
+                        </menuitem>
+                    </menubar>
+                    <separator spacing="20px" />
+                    <panel width="500px"  style="float: left; padding-right: 20px" >
+                        <panelchildren>
+                            <groupbox form="@id('zk_cliente') @bind(vm.selectedEvent)" mold="3d" closable="false">
+                                <caption label="Dirección" image="/images/book_addresses.png"  />
+                                <grid id="Direccion">
+                                    <columns>
+                                        <column align="right" width="150px" />
+                                        <column width="100%" />
+                                    </columns>
+                                    <rows>
+                                        <row>
+                                            <label value="NIF/CIF" width="150px" />
+                                            <textbox  cols="25" value="@load(zk_cliente.nif)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Nombre" width="150px" />
+                                            <textbox cols="25" value="@load(zk_cliente.nombre)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Apellidos" width="150px" />
+                                            <textbox cols="25" value="@load(zk_cliente.apellidos)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Direccion" width="150px" />
+                                            <textbox cols="25" value="@load(zk_cliente.direccion)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Provincia" width="200px" />
+                                            <textbox cols="25" value="@load(zk_cliente.provincia.provincia)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Ciudad" width="200px" /> 
+                                            <textbox cols="25" value="@load(zk_cliente.ciudad.poblacion)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Código postal" width="200px" /> 
+                                            <intbox cols="25" value="@load(zk_cliente.codigopostal)" width="200px" readonly="true"/>
+                                        </row>
+                                    </rows>
+                                </grid>
+                                <grid id="DireccionMod" visible="false">
+                                    <columns>
+                                        <column align="right" width="150px" />
+                                        <column width="100%" />
+                                    </columns>
+                                    <rows>
+                                        <row>
+                                            <label value="NIF/CIF" width="150px" />
+                                            <textbox id="txtNIF" cols="25" value="@bind(zk_cliente.nif)" width="200px" constraint="/^([X|x](-|\.)?0?\d{7}(-|\.)?[A-Za-z]|[A-Za-z](-|\.)?\d{7}(-|\.)?[0-9A-Za-z]|\d{8}(-|\.)?[A-Za-z])$/: NIF/CIF incorrecto" maxlength="9" />
+                                        </row>
+                                        <row>
+                                            <label value="Nombre" width="150px" />
+                                            <textbox id="txtNombre" cols="25" value="@bind(zk_cliente.nombre)" width="200px" />
+                                        </row>
+                                        <row>
+                                            <label value="Apellidos" width="150px" />
+                                            <textbox id="txtApellidos" cols="25" value="@bind(zk_cliente.apellidos)" width="200px" />
+                                        </row>
+                                        <row>
+                                            <label value="Direccion" width="150px" />
+                                            <textbox id="txtDireccion"  cols="25" value="@bind(zk_cliente.direccion)" width="200px" />
+                                        </row>
+                                        <row>
+                                            <label value="Provincia" width="200px" />
+                                            <selectbox id="provincias" 
+                                                      model="@load(vm.provincias)" 
+                                                      selectedItem="@bind(vm.selectedProvincia) 
+                                                                    @bind(zk_cliente.provincia)"  
+                                                      onSelect="@command('onSelectProvincia')" 
+                                                      width="200px" >
+                                                <template name="model">
+                                                    <label value="@bind(each.provincia)" /> <!--label="@bind(each.provincia)" />-->
+                                                </template>
+                                            </selectbox>
+                                        </row>
+                                        <row>
+                                            <label value="Ciudad" width="200px" /> 
+                                            <selectbox id="poblaciones" 
+                                                      model="@load(vm.allPoblaciones)" 
+                                                      selectedItem="@bind(zk_cliente.ciudad)"  
+                                                      width="200px" >
+                                                <template name="model">
+                                                    <label value="@bind(each.poblacion)"/> <!--label="@bind(each.poblacion)" />-->
+                                                </template>
+                                            </selectbox>
+                                        </row>
+                                        <row>
+                                            <label value="Código postal" width="200px" /> 
+                                            <intbox cols="25" value="@bind(zk_cliente.codigopostal)" width="200px" maxlength="5"/>
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </groupbox>
+                        </panelchildren>
+                    </panel>
+                    
+                    <panel border="none" style="padding-right:20px" width="500px">
+                        <panelchildren>
+                            <groupbox mold="3d" closable="false">
+                                <caption image="/images/contact_email.png" label="Email" />
+
+                                <grid>
+                                    <columns>
+                                        <column align="right" width="150px" />
+                                        <column width="100%" />
+                                    </columns>
+                                    <rows>
+                                        <row>
+                                            <label value="E-mail"/>
+                                            <textbox id="txtEmail"   
+                                                     cols="25" 
+                                                     value="@bind(zk_cliente.email)" 
+                                                     width="200px" 
+                                                     readonly="true"/> <!-- constraint="/.+@.+\.[a-z]+/: Please enter an e-mail address" -->
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </groupbox>
+                        </panelchildren>
+                    </panel>
+                    <separator spacing="20px" />
+                    <panel border="none" style="padding-right:20px" width="500px">
+                        <panelchildren>
+                            <groupbox mold="3d" closable="false">
+                                <caption
+                                    image="/images/telephone.png"
+                                    label="Teléfono/Fax" />
+
+                                <grid>
+                                    <columns>
+                                        <column
+                                            align="right" width="150px" />
+                                        <column
+                                            width="100%" />
+                                    </columns>
+                                    <rows>
+                                       <row>
+                                            <label value="Teléfono 1"/>
+                                            <textbox id="intTelefono"    
+                                                     cols="25" 
+                                                     value="@bind(zk_cliente.telefono)" 
+                                                     width="200px" 
+                                                     constraint="/^[9|6|7][0-9]{8}$/: Teléfono incorrecto" 
+                                                     maxlength="9" 
+                                                     readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Teléfono 2"/>
+                                            <textbox id="intTelefono2"
+                                                     cols="25" 
+                                                     value="@bind(zk_cliente.telefono2)" 
+                                                     maxlength="9" 
+                                                     width="200px" 
+                                                     readonly="true"/>
+<!--                                            <textbox id="intTelefono2n"
+                                                     if="${zk_cliente.telefono2 == null}"
+                                                     cols="25" 
+                                                     value="@save(zk_cliente.telefono2)" 
+                                                     maxlength="9" 
+                                                     width="200px" 
+                                                     readonly="true"/>-->
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </groupbox>
+                        </panelchildren>
+                    </panel>
+                </tabpanel>
+                <tabpanel id="mascotasCliente"  fulfill="tabMascotas.onSelect"  height="550px">
+                    <menubar id="menuMasc" >
+                        <menuitem id="add"      image="../images/nuevo.png"     label="Nuevo"       onClick="@command('asignarMascota')" />
+                        <menuseparator />
+                        <menuitem id="delete"   image="../images/delete.png"    label="Eliminar"    disabled="@load(empty vm.selectedMascota)" >
+                            <attribute name="onClick">
+                                <![CDATA[
+                                    Messagebox.show("¿Desea elimimar " + vm.selectedMascota.getNombre() + " ?", 
+                                    "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                                        new org.zkoss.zk.ui.event.EventListener(){
+                                            public void onEvent(Event e){
+                                                if(Messagebox.ON_OK.equals(e.getName())){
+                                                    vm.deletemasc();
+                                                    Executions.sendRedirect("cliente-template.zul");
+                                                    //final HashMap<String, Object> map = new HashMap<String, Object>();
+                                                    //map.put("selectedCliente", selectedEvent );
+                                                    //Executions.createComponents("../cliente.zul", null, map);
+                                                }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                                    
+                                                }
+                                            }
+                                        }
+                                    );
+                                ]]>
+                            </attribute>
+                        </menuitem>
+                    </menubar>
+                    <listbox id="mascbox" 
+                             mold="paging" 
+                             pageSize="15" 
+                             rows="15" 
+                             model="@load(vm.mascotas)" 
+                             selectedItem="@bind(vm.selectedMascota)" 
+                             height="520px" >
+                        <listhead>
+                            <listheader label="Nº Chip"             sort="auto(chip)"/>
+                            <listheader label="Nombre"              sort="auto(nombre)" />
+                            <listheader label="Fecha Nacimiento"    sort="auto(nacimiento)" />
+                            <listheader label="Raza"                sort="auto(raza.raza)" />
+                            <listheader label="Especie"             sort="auto(especie.especie)" />
+                            <!--<listheader label="Fecha Alta"  sort="auto(fecha_alta)"  width="170px" />-->
+                        </listhead>
+                        <template name="model" var="zk_mascota">
+                            <listitem value="@load(zk_mascota)">
+                                <listcell label="@load(zk_mascota.chip)" context="${zk_mascota.id}"> 
+<!--                                    <menupopup id="${zk_mascota.id}">
+                                        <menuitem label="Ir a" src="../images/page_go.png" onClick="@command('showMascota')" />
+                                    </menupopup>-->
+                                </listcell>
+                                <listcell label="@load(zk_mascota.nombre)"      context="${zk_mascota.id}"/>
+                                <listcell label="@load(zk_mascota.nacimiento) @converter('formatedDate', format='dd/MM/yyyy')"  context="${zk_mascota.id}"/>
+                                <listcell label="@load(zk_mascota.raza.raza)"   context="${zk_mascota.id}"/>
+                                <listcell label="@load(zk_mascota.especie.especie)" context="${zk_mascota.id}"/>
+                                <!--<listcell label="@load(zk_mascota.fecha_alta)" />-->
+                            </listitem>
+                        </template>
+                    </listbox>
+                </tabpanel>
+                <tabpanel id="citasCliente" fulfill="tabCitas.onSelect" height="550px">
+                    <menubar id="menuCitas" >
+                        <menuitem id="addcita"      image="../images/nuevo.png"     label="Nuevo"       onClick="@command('asignarCita')" />
+                        <menuseparator />
+                        <menuitem id="deletecita"   image="../images/delete.png"    label="Eliminar"    disabled="@load(empty vm.selectedCita)" >
+                            <attribute name="onClick">
+                                <![CDATA[
+                                    Messagebox.show("¿Desea elimimar " + vm.selectedCita.getFecha() + " ?", 
+                                    "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                                        new org.zkoss.zk.ui.event.EventListener(){
+                                            public void onEvent(Event e){
+                                                if(Messagebox.ON_OK.equals(e.getName())){
+                                                    vm.deletecita();
+                                                    Executions.sendRedirect("cliente-template.zul");
+                                                }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                                    
+                                                }
+                                            }
+                                        }
+                                    );
+                                ]]>
+                            </attribute>
+                        </menuitem>
+                        
+                    </menubar>
+                    <listbox id="citasbox" 
+                             multiple="true" 
+                             mold="paging" 
+                             pageSize="14" 
+                             rows="14" 
+                             model="@bind(vm.citas)" 
+                             selectedItem="@bind(vm.selectedCita)" 
+                             height="520px" >
+                       <listhead>
+                           <listheader label="Número"      sort="auto(id)"     width="70px"     align="center"/>
+                           <listheader label="Nombre"      sort="auto(mascota.nombre)" width="200px"/>
+                           <listheader label="Estado"      sort="auto(estado)" width="120px"    align="center"/>
+                           <listheader label="Fecha"       sort="auto(fecha)"  width="100px"     align="center"/>
+                           <listheader label="Hora"        sort="auto(hora)"   width="100px"     align="center"/>
+                           <listheader label="Tipo"        sort="auto(servicio.nombre)" width="100px"   align="center"/>
+                           <listheader label="Informe"     sort="auto(informe)"/>
+                       </listhead>
+                       <template name="model" var="zk_cita">
+                           <listitem value="@load(zk_cita)">
+                               <listcell label="@load(zk_cita.id)" />
+                               <listcell label="@load(zk_cita.mascota.nombre)"  />
+                               <listcell label="Cancelado"  if="${zk_cita.estado == '0'}" src="/images/delete_1.png" /> <!-- CANCELADO -->
+                               <listcell label="Acudido"    if="${zk_cita.estado == '1'}" src="/images/accept.png" /> <!-- ACUDIDO -->
+                               <listcell label="Pendiente"  if="${zk_cita.estado == '2'}" src="/images/error.png" /> <!-- PENDIENTE -->
+                               <listcell label="Avisado"    if="${zk_cita.estado == '3'}" src="/images/telephone.png" /> <!-- AVISADO -->
+                               <listcell label="@load(zk_cita.fecha) @converter('formatedDate', format='dd/MM/yyyy')" />
+                               <listcell label="@load(zk_cita.hora)" />
+                               <listcell label="@load(zk_cita.servicio.nombre)" if="${zk_cita.servicio != null}"/>
+                               <listcell label=""  if="${zk_cita.servicio == null}" />
+                               <listcell label=""  if="${zk_cita.informe == 'null'}" />
+                               <listcell label="@load(zk_cita.informe)" if="${zk_cita.informe != 'null'}" />
+                           </listitem>
+                       </template>
+                   </listbox>
+                </tabpanel>
+                <tabpanel id="ventasCliente" 
+                          fulfill="tabVentas.onSelect" 
+                          height="550px" >
+                    <listbox id="ventasbox" 
+                             mold="paging" 
+                             pageSize="15" 
+                             rows="15" 
+                             model="@bind(vm.ventas)" 
+                             selectedItem="@bind(vm.selectedVenta)" 
+                             height="520px" >
+                       <listhead>
+                            <listheader label="Número"          sort="auto(id)" width="80px" align="center"/>
+                            <listheader label="Cliente"         sort="auto(cliente.fullname)" />
+                            <listheader label="Fecha"           sort="auto(fecha)" align="center" width="100px"/>
+                            <listheader label="Hora"            sort="auto(hora)"  align="center" width="100px"/>
+                            <listheader label="N. Artículos"    sort="auto(num_articulos)" align="center" width="100px"/>
+                            <listheader label="Vendedor"        sort="auto(vendedor.nombre)" width="160px"/>
+                            <listheader label="Coste total"     sort="auto(coste)" align="right" width="120px"/>
+                        </listhead>
+                        <template name="model" var="zk_venta">
+                            <listitem value="@load(zk_venta)">
+                                <listcell label="@load(zk_venta.id)" context="${zk_venta.id}">
+                                    <menupopup id="${zk_venta.id}">
+                                        <menuitem label="Ir a"  src="../images/page_go.png"  onClick="@command('showVentaLinea')" />
+                                    </menupopup>
+                                </listcell>
+                                <listcell label="@load(zk_venta.cliente.fullname)"  context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.fecha) @converter('formatedDate', format='dd/MM/yyyy')"             context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.hora) @converter('formatedDate', format='HH:mm')"              context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.num_articulos)"     context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.vendedor.nombre)"   context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.coste) @converter('formatedNumber', format='#,##0.00 €')" context="${zk_venta.id}"/>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </window>
+</zk>

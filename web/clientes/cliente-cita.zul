@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Obsoleto, se queda en el nuevo perfil -->
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" title="Clientes" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.clientes.ClienteCitaVM')"
+            validationMessages="@id('vmsgs')"  visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+                    
+                    win.setVisible(true);
+                }
+        
+        </zscript> 
+
+        <div><include src="../${menu}"/></div>
+        <menubar id="menu" >
+            <menuitem id="add"      image="../images/nuevo.png"     label="Nuevo"       onClick="@command('add')"/>
+            <menuitem id="update"   image="../images/guardar.png"   label="Guardar"     onClick="@command('update'), Desactivar()" disabled="true"/>
+            <menuseparator />
+            <menuitem id="activar"  image="../images/modificar.png" label="Modificar"   onClick="Activar()" disabled="@load(empty vm.selectedCita)"/>
+            <menuitem id="delete"   image="../images/delete.png"    label="Eliminar"    disabled="true" >
+                <attribute name="onClick">
+                    <![CDATA[
+                        Messagebox.show("¿Desea elimimar " + vm.selectedCita.getFecha() + " ?", 
+                        "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                            new org.zkoss.zk.ui.event.EventListener(){
+                                public void onEvent(Event e){
+                                    if(Messagebox.ON_OK.equals(e.getName())){
+                                        vm.delete();
+                                        Executions.sendRedirect("cliente-template.zul");
+                                    }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                        Desactivar();
+                                    }
+                                }
+                            }
+                        );
+                    ]]>
+                </attribute>
+             </menuitem>
+            <zscript>
+                    Activar() {
+                        dateFecha.setDisabled(false);
+                        listTipo.setDisabled(false);
+                        timeHora.setDisabled(false);
+                        textInforme.setDisabled(false);
+                        update.setDisabled(false);
+                        delete.setDisabled(false);
+                    }
+                    
+                    Desactivar() {
+                        dateFecha.setDisabled(true);
+                        listTipo.setDisabled(true);
+                        timeHora.setDisabled(true);
+                        textInforme.setDisabled(true);
+                        update.setDisabled(true);
+                        delete.setDisabled(true);
+                    }
+            </zscript>
+        </menubar>
+        <!--<div width="750px" height="453px"></div>-->
+        <groupbox id="grpcli" closable="false" form="@id('zk_cliente') @load(vm.selectedEvent) ">
+            <caption label="Cliente" />
+            <div style="margin-bottom:10px">
+                NIF:    <textbox id="txtNIF"    cols="25" value="@bind(zk_cliente.nif)"     style="margin-left:33px; margin-right: 15px;" disabled="true" />
+                Nombre: <textbox id="txtNombre" cols="25" value="@bind(zk_cliente.nombre)"  style="margin-left: 10px; margin-right:15px" disabled="true" />
+                Apellidos:<textbox id="txtApellidos" cols="25" value="@bind(zk_cliente.apellidos)" style="margin-left: 2px;" disabled="true"/>
+            </div>
+           <!-- Fecha Alta:
+                <datebox id="dateFechaAlta" cols="8" value="@bind(zk_cliente.fecha_alta)" />-->
+            <div style="margin-bottom:10px">
+                Direccion:  <textbox id="txtDireccion"  cols="25" value="@bind(zk_cliente.direccion)" style="margin-right:15px" disabled="true" />
+                Ciudad:     <textbox id="txtCiudad"     cols="25" value="@bind(zk_cliente.ciudad.poblacion)"    style="margin-left: 15px; margin-right: 14px" disabled="true" />
+                Provincia:  <textbox id="txtProvincia"  cols="25" value="@bind(zk_cliente.provincia.provincia)" disabled="true" />
+            </div>
+            <div style="margin-bottom:10px">
+                Teléfono:   <intbox id="intTelefono"    cols="25" value="@bind(zk_cliente.telefono)"  style="margin-left:3px; margin-right:15px" disabled="true" />
+                Teléfono 2:  <intbox id="intTelefono2"   cols="25" value="@bind(zk_cliente.telefono2)" style="margin-right:15px;" disabled="true" />
+                Email:      <textbox id="txtEmail"      cols="25" value="@bind(zk_cliente.email)"     style="margin-left:18px" constraint="/.+@.+\.[a-z]+/: Por favor, introduce una dirección de e-mail" disabled="true" />
+            </div>    
+           <!-- <hlayout>
+                <label style="color:red" value="@load(vmsgs['nif'])" />
+                <label style="color:red" value="@load(vmsgs['nombre'])" />
+                <label style="color:red" value="@load(vmsgs['apellidos'])" />
+                <label style="color:red" value="@load(vmsgs['fecha_alta'])" />
+                <label style="color:red" value="@load(vmsgs['direccion'])" />
+                <label style="color:red" value="@load(vmsgs['ciudad'])" />
+                <label style="color:red" value="@load(vmsgs['provincia'])" />
+                <label style="color:red" value="@load(vmsgs['telefono'])" />
+                <label style="color:red" value="@load(vmsgs['telefono2'])" />
+                <label style="color:red" value="@load(vmsgs['email'])" />
+            </hlayout>-->
+        </groupbox>
+        <listbox id="box" multiple="true" mold="paging" pageSize="12" rows="12" 
+                 model="@bind(vm.citas)" selectedItem="@bind(vm.selectedCita)">
+            <listhead>
+                <listheader label="Número"      sort="auto(id)"     width="60px"/>
+                <listheader label="Nombre"      sort="auto(cliente.nombre)" width="150px"/>
+                <listheader label="Apellidos"   sort="auto(cliente.apellidos)" width="200px"/>
+                <listheader label="Fecha"       sort="auto(fecha)"  width="90px" />
+                <listheader label="Hora"        sort="auto(hora)"   width="90px"/>
+                <listheader label="Tipo"        sort="auto(servicio.nombre)"   width="90px"/>
+                <listheader label="Informe"     sort="auto(informe)"/>
+            </listhead>
+            <template name="model" var="zk_cita">
+                <listitem value="@load(zk_cita)">
+                    <listcell label="@load(zk_cita.id)" />
+                    <listcell label="@load(zk_cita.cliente.nombre)" />
+                    <listcell label="@load(zk_cita.cliente.apellidos)"  />
+                    <listcell label="@load(zk_cita.fecha)" />
+                    <listcell label="@load(zk_cita.hora)" />
+                    <listcell label="@load(zk_cita.servicio.nombre)" />
+                    <listcell label="@load(zk_cita.informe)" />
+                </listitem>
+            </template>
+        </listbox>
+        <groupbox id="grpcita" closable="false" form="@id('zk_cita') @load(vm.selectedCita) ">
+            <caption label="Producto Nuevo" />
+            <div style="margin-bottom:10px">
+                Fecha: <datebox id="dateFecha"  cols="25" value="@bind(zk_cita.fecha)"     style="margin-left: 10px; margin-right:15px"/>
+                Hora: <timebox id="timeHora"    cols="25"  value="@bind(zk_cita.hora)" format="HH:mm"/>
+                Tipo: <listbox id="listTipo"  mold="select" selectedItem="@bind(zk_cita.tipo)">
+                        <listitem label="Analgésico" value="1" />
+                        <listitem label="Gasas" value="2" />
+                      </listbox>
+                Informe: <textbox id="textInforme" value="@bind(zk_cita.informe)"/>
+                
+            </div>
+            <!--<hlayout>
+                <label style="color:red" value="@load(vmsgs['chip'])" />
+                <label style="color:red" value="@load(vmsgs['nombre'])" />
+                <label style="color:red" value="@load(vmsgs['nacimiento'])" />
+                <label style="color:red" value="@load(vmsgs['fecha_alta'])" />
+                <label style="color:red" value="@load(vmsgs['peso'])" />
+            </hlayout>-->
+        </groupbox>
+    </window>
+</zk>

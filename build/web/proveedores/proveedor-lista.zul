@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winproveedorlista" title="Proveedores" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.proveedores.ProveedorViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+      <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+                    
+                    winproveedorlista.setVisible(true);
+                }
+        
+        </zscript>         
+        <div><include src="../${menu}"/></div>
+        <style src="../estilos/listbox20h.css"/>
+        <menubar id="menu" >
+            <menuitem id="add" 
+                      image="../images/nuevo.png" 
+                      label="Nuevo" 
+                      onClick='Executions.createComponents("/proveedores/proveedor-nuevo.zul", null, null)' 
+                      tooltiptext="Nuevo"/>
+            <menuseparator visible="@load(not empty vm.selectedEvent)" />
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar"  
+                      disabled="@load(empty vm.selectedEvent)"
+                      visible="@load(not empty vm.selectedEvent)"
+                      tooltiptext="Eliminar">
+                <attribute name="onClick">
+                    <![CDATA[
+                        Messagebox.show("¿Desea elimimar " + vm.selectedEvent.getNombre() + " ?", 
+                        "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                            new org.zkoss.zk.ui.event.EventListener(){
+                                public void onEvent(Event e){
+                                    if(Messagebox.ON_OK.equals(e.getName())){
+                                        vm.delete();
+                                        Executions.sendRedirect("proveedor-lista.zul");
+                                    }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                        delete.setDisabled(true);
+                                    }
+                                }
+                            }
+                        );
+                    ]]>
+                </attribute>
+            </menuitem>
+        </menubar>
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="14" 
+                 rows="14" 
+                 multiple="true" 
+                 model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ningún ítem encontrado">
+            <listhead>
+                <listheader label="CIF"         sort="auto(nif)" width="8%"/>
+                <listheader label="Nombre"      sort="auto(nombre)" width="17%"/>
+                <listheader label="Dirección"   sort="auto(direccion)"/>
+                <listheader label="Ciudad"      sort="auto(poblacion)"/>
+                <listheader label="Provincia"   sort="auto(provincia)"/>
+                <listheader label="Teléfono"    sort="auto(telefono)" width="7%" />
+                <listheader label="Teléfono 2"  sort="auto(telefono2)" width="7%" />
+                <listheader label="Fax"         sort="auto(fax)"  width="7%" />
+                <listheader label="Email"       sort="auto(email)"/>
+                <listheader label="Contacto"    />
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCif)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterDireccion)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCiudad)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProvincia)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterTelefono)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterTelefono2)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFax)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEmail)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterContacto)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+            </auxhead>
+            <template name="model" var="zk_proveedor">
+                <listitem value="@load(zk_proveedor)" onDoubleClick="@command('modificarProveedor')">
+                    <listcell label="@load(zk_proveedor.nif)" />
+                    <listcell label="@load(zk_proveedor.nombre)" />
+                    <!--<listcell label="@load(zk_proveedor.fecha_alta)" />-->
+                    <listcell label="@load(zk_proveedor.direccion)" />
+                    <listcell label="@load(zk_proveedor.poblacion.poblacion)" />
+                    <listcell label="@load(zk_proveedor.provincia.provincia)" />
+                    <listcell label="@load(zk_proveedor.telefono)" />
+                    <listcell label="@load(zk_proveedor.telefono2)" />
+                    <listcell label="@load(zk_proveedor.fax)" />
+                    <listcell label="@load(zk_proveedor.email)" />
+                    <listcell label="@load(zk_proveedor.contacto)" />
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

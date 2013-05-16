@@ -1,0 +1,52 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win-iva-nuevo" title="IVA Nuevo" border="normal"
+            width="600px" height="500px" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.iva.IvaViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="add"    image="/images/nuevo.png"   label="Nuevo"     onClick="@command('add')" tooltiptext="Nuevo"/>
+            <menuitem id="update" image="/images/guardar.png" label="Modificar" onClick="@command('update')" disabled="@load(empty vm.selectedEvent)" tooltiptext="Modificar" />
+        </menubar>
+        <listbox id="box" mold="paging" pageSize="8" multiple="true" rows="8" model="@bind(vm.events)" height="300px"
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <!--<listheader label="Número"  sort="auto(id)"     width="80px"/>-->
+                <listheader label="% Valor" sort="auto(valor)"  width="60px"    align="center"/>
+                <listheader label="Nombre"  sort="auto(nombre)" width="120px"/>
+                <listheader label="Descripción" />
+            </listhead>
+            <template name="model" var="zk_iva">
+                <listitem value="@load(zk_iva)">
+                    <!--<listcell label="@load(zk_iva.id)" />-->
+                    <listcell label="@load(zk_iva.valor)" />
+                    <listcell label="@load(zk_iva.nombre)" />
+                    <listcell label="@load(zk_iva.descripcion)"  />
+                </listitem>
+            </template>
+        </listbox>
+        <groupbox id="mygrp"
+                  form="@id('zk_iva') @load(vm.selectedEvent) @save(vm.selectedEvent, before='update') 
+                        @save(vm.newEvent, before='add') " height="120px" closable="false">
+            <caption label="IVA Nuevo" />
+            <vbox>
+                <hbox style="margin-top: 5px">
+                    <label  value="Valor:"  style="float:left; margin-right: 5px" /> 
+                    <intbox cols="10" value="@bind(zk_iva.valor)" style="float: left;" constraint="no empty"/>
+                    <label  value="Nombre:"  style="float:left; margin-right: 5px; margin-left: 10px" /> 
+                    <textbox cols="35" value="@bind(zk_iva.nombre)" style="float: left;" constraint="no empty"/>
+                </hbox>
+                <div style="margin-top: 10px">
+                    <label value="Descripción:" style="float: left; margin-right: 5px"/> 
+                    <textbox  value="@bind(zk_iva.descripcion)" rows="3" width="322px" />
+                </div>
+            </vbox>
+            <hlayout>
+                <label style="color:red" value="@load(vmsgs['id'])" />
+                <label style="color:red" value="@load(vmsgs['nombre'])" />
+            </hlayout>
+        </groupbox>
+    </window>
+</zk>

@@ -1,0 +1,46 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winbuscarcliente" title="Productos" border="normal"
+            width="800px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            onCancel="winbuscarcliente.detach()"
+            onOK="winbuscarcliente.detach()"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.clientes.ClienteViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="send"  
+                      image="/images/check_box.png"  
+                      label="Enviar"  
+                      disabled="@load(empty vm.selectedEvent)" 
+                      tooltiptext="Enviar">
+                <attribute 
+                    name="onClick">
+                    vm.modificarPropietario(); 
+                    winbuscarcliente.detach();
+                </attribute>
+            </menuitem>
+        </menubar>
+        <listbox id="box" mold="paging" pageSize="8" multiple="true" rows="8" model="@bind(vm.clientes)" 
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <listheader label="DNI"      sort="auto(codigo)">
+                    <textbox value="@bind(vm.filterDni)" instant="true" onChange="@command('doSearch')" width="130px" />
+                </listheader>
+                <listheader label="Nombre"      sort="auto(nombre)" >
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')" width="130px" />
+                </listheader>
+                <listheader label="Apellidos"      sort="auto(proveedor.nombre)" >
+                    <textbox value="@bind(vm.filterApellidos)" instant="true" onChange="@command('doSearch')" width="130px" />
+                </listheader>
+            </listhead>
+            <template name="model" var="zk_cliente">
+                <listitem value="@load(zk_cliente)"  onOK="@command('send')" >
+                    <listcell label="@load(zk_cliente.nif)" />
+                    <listcell label="@load(zk_cliente.nombre)" />
+                    <listcell label="@load(zk_cliente.apellidos)" />
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

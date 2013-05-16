@@ -1,0 +1,33 @@
+<grid width="480px">
+	<auxhead>
+		<auxheader label="Q3" colspan="3" />
+		<auxheader label="Q4" colspan="3" />
+	</auxhead>
+	<columns>
+		<column label="Jul" /><column label="Aug" /><column label="Sep" />
+		<column label="Oct" /><column label="Nov" /><column label="Dec" />
+	</columns>
+	<rows>
+		<row>
+			<label value="2,500"/><label value="1,000"/><label value="2,800"/>
+			<label value="2,900"/><label value="3,000"/><label value="2,200"/>
+		</row>
+		<row>
+			<label value="2,600"/><label value="2,700"/><label value="2,800"/>
+			<label value="2,350"/><label value="3,000"/><label value="2,800"/>
+		</row>
+		<row>
+			<label value="2,200"/><label value="3,500"/><label value="1,000"/>
+			<label value="2,300"/><label value="3,000"/><label value="2,500"/>
+		</row>
+		<row>
+			<label value="2,500"/><label value="3,200"/><label value="1,900"/>
+			<label value="2,190"/><label value="3,060"/><label value="1,500"/>
+		</row>
+		<row>
+			<label value="1,500"/><label value="3,700"/><label value="1,800"/>
+			<label value="1,350"/><label value="6,000"/><label value="2,500"/>
+		</row>
+	</rows>
+</grid>
+		

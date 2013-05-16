@@ -1,0 +1,91 @@
+<menubar id="menubar">
+    <menuitem label="Inicio" src="/images/house.png" href="/principal.zul"/>
+    <zscript>
+        <![CDATA[
+            import org.zkoss.zk.ui.Executions;
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String snombre, srol;
+            int rol;
+                        
+            public void Nuevo(String ruta) {
+                Executions.createComponents(ruta, null, null);
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    rol = UserCredentialManager.getIntance(session).getRol();
+                    snombre = UserCredentialManager.getIntance(session).getUser().getNombre();
+                    if(rol == 1){
+                        srol = "Administrador";
+                    }
+                    else if(rol == 2){
+                        srol = "Veterinario";
+                    }
+                    else if(rol == 3){
+                        srol = "Gestor";
+                    }
+                    else{
+                        srol="Empleado";
+                    }
+                }
+        ]]>
+    </zscript>
+    <menu label="Clientes" src="/images/user.png" >
+        <menupopup>
+            <menuitem src="/images/group.png" label="Clientes" href="/clientes/cliente-template.zul" />
+            <menuitem src="/images/date.png" label="Citas" href="/citas/cita-lista.zul" />
+        </menupopup>
+    </menu>
+    <menuitem label="Mascotas" src="/images/dog.png" href="/mascotas/mascota-template.zul" />
+    <menu label="Artículos" src="/images/three_tags.png" >
+        <menupopup>
+            <menuitem label="Productos" src="/images/tag_blue.png" href="/productos/producto-lista.zul" />
+            <menuitem label="Servicios" src="/images/tag_green.png" href="/servicios/servicio-lista.zul" />
+        </menupopup>
+    </menu>
+    <menu label="Ventas" src="/images/money_euro.png" >
+        <menupopup>
+            <menuitem src="/images/money_euro.png" label="Nueva Venta" href="/ventas/venta-lineas.zul"/>
+            <menuitem src="/images/money_euro.png" label="Listar Ventas" href="/ventas/venta-template.zul"/>
+            <menuitem src="/images/page_white_text.png" label="Facturas" href="/facturas/factura-template.zul"/>
+        </menupopup>
+    </menu>
+    <menu label="Proveedores" src="/images/lorry.png" >
+        <menupopup>
+            <menuitem src="/images/lorry.png" label="Proveedores" href="/proveedores/proveedor-lista.zul"/>
+            <menuitem src="/images/cart.png" label="Pedidos"     href="/pedidos/pedido-template.zul"/>
+        </menupopup>
+    </menu>
+    <menu label="Estadísticas" src="/images/chart_column.png" >
+        <menupopup>
+            <menuitem src="/images/chart_curve.png" label="Mascota"         href="/estadisticas/estadistica-mascota.zul"/>
+            <menuitem src="/images/chart_bar.png"   label="Ingresos/Gastos" href="/estadisticas/estadistica-monetario.zul"/>
+        </menupopup>
+    </menu>
+    <menu label="Configuración" image="/images/cog.png">
+        <menupopup>
+            <menuitem src="/images/twitter_2.png"   label="Especie Nueva"  onClick='Nuevo("/configuracion/especie-nueva.zul")'/>
+            <menuitem src="/images/toucan.png"      label="Raza Nueva"     onClick='Nuevo("/configuracion/raza-nueva.zul")'/>
+            <menuitem src="/images/injection.png"   label="Vacuna Nueva"   onClick='Nuevo("/configuracion/vacuna-nueva.zul")'/>
+            <menuitem src="/images/brick_add.png"   label="Familia Servicio Nuevo" onClick='Nuevo("/configuracion/servicio-familia-nuevo.zul")'/>
+            <menuitem src="/images/three_tags.png"  label="Familia Producto Nuevo"  onClick='Nuevo("/configuracion/producto-familia-nuevo.zul")'/>
+            <menuitem src="/images/coins_add.png"   label="IVA Nuevo"      onClick='Nuevo("/configuracion/iva-nuevo.zul")'/>
+            <menuitem src="/images/user.png"        label="Usuarios"  href="/users/user-lista.zul" if="${rol == 1}"/>
+        </menupopup>
+    </menu>
+    <menuseparator/>
+    <menu label="${snombre} (${srol})" style="margin-left: 50px" >
+        <menupopup>
+            <menuitem src="/images/lock_edit.png" 
+                      label="Cambiar contraseña" 
+                      onClick='Nuevo("/users/user-password.zul")' />
+            <menuitem src="/images/door_in.png" 
+                      label="Salir" 
+                      onClick="logout()"/>
+        </menupopup>
+    </menu>
+</menubar>

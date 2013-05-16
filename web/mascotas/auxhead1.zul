@@ -1,0 +1,35 @@
+<grid width="480px">
+	<auxhead>
+                <auxheader label="" />
+		<auxheader label="Q1" colspan="3" />
+		<auxheader label="Q2" colspan="3" />
+	</auxhead>
+	<columns>
+                <column label="Tipo" />
+		<column label="Jan" /><column label="Feb" /><column label="Mar" />
+		<column label="Apr" /><column label="May" /><column label="Jun" />
+	</columns>
+	<rows>
+		<row>
+			<label value="Defuncion"/><label value="1,600"/><label value="1,000"/><label value="1,800"/>
+			<label value="1,900"/><label value="2,000"/><label value="2,100"/>
+		</row>
+		<row>
+			<label value="Defuncion"/><label value="1,500"/><label value="3,700"/><label value="1,800"/>
+			<label value="1,350"/><label value="2,000"/><label value="2,500"/>
+		</row>
+		<row>
+			<label value="Defuncion"/><label value="1,400"/><label value="3,500"/><label value="1,800"/>
+			<label value="1,300"/><label value="2,000"/><label value="2,500"/>
+		</row>
+		<row>
+			<label value="Defuncion"/><label value="1,500"/><label value="3,700"/><label value="1,800"/>
+			<label value="1,390"/><label value="2,060"/><label value="2,500"/>
+		</row>
+		<row>
+			<label value="Defuncion"/><label value="1,500"/><label value="3,700"/><label value="1,800"/>
+			<label value="1,350"/><label value="6,000"/><label value="2,500"/>
+		</row>
+	</rows>
+</grid>
+		

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" 
+             title="Productos" 
+             border="normal"
+             apply="org.zkoss.bind.BindComposer"
+             viewModel="@id('vm') @init('es.clinica.veterinaria.productos.ProductoViewModel')"
+             validationMessages="@id('vmsgs')" 
+             visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+
+                    win.setVisible(true);
+                }
+
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <div><include src="../${menu}"/></div>
+        <!--<div width="750px" height="453px"></div>-->
+        <menubar id="menu" >
+            <menuitem id="add"
+                      image="../images/nuevo.png"
+                      label="Nuevo"
+                      onClick="@command('addproducto')"
+                      tooltiptext="Nuevo"/>
+<!--            <menuseparator />
+            <menuitem id="activar"
+                      image="../images/modificar.png"
+                      label="Modificar"
+                      onClick="@command('modificarProducto')"
+                      tooltiptext="Modificar" disabled="@load(empty vm.selectedEvent)"/>-->
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar"  
+                      disabled="@load(empty vm.selectedEvent)" 
+                      visible="@load(not empty vm.selectedEvent)"
+                      tooltiptext="Eliminar">
+                <attribute name="onClick">
+                    <![CDATA[
+                        Messagebox.show("¿Desea elimimar " + vm.selectedEvent.getNombre() + " ?",
+                        "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                            new org.zkoss.zk.ui.event.EventListener(){
+                                public void onEvent(Event e){
+                                    if(Messagebox.ON_OK.equals(e.getName())){
+                                        vm.delete();
+                                        Executions.sendRedirect("producto-template.zul");
+                                    }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                        delete.setDisabled(true);
+                                    }
+                                }
+                            }
+                        );
+                    ]]>
+                </attribute>
+            </menuitem>
+        </menubar>
+        <listbox id="box"
+                 mold="paging"
+                 pageSize="14"
+                 rows="14"
+                 multiple="true"
+                 model="@bind(vm.events)"
+                 selectedItem="@bind(vm.selectedEvent)" emptyMessage="Ningún ítem encontrado">
+            <listhead>
+                <listheader label="Código"      sort="auto(codigo)"     width="150px"/>
+                <listheader label="Nombre"      sort="auto(nombre)"     width="220px"/>
+                <listheader label="Familia"     sort="auto(familia)"    width="180px"/>
+                <listheader label="Proveedor"   sort="auto(proveedor)"  width="200px"/>
+                <listheader label="Fecha Alta"  sort="auto(fecha_alta)" align="center" width="100px"/>
+                <listheader label="Stock"       sort="auto(stock)"      align="center" width="80px"/>
+                <listheader label="IVA %"       sort="auto(iva.valor)"  align="center" width="80px"/>
+                <listheader label="Precio"      sort="auto(precio)"     width="150px"   align="right"/>
+                <listheader label="PVP"         sort="auto(pvp)"        width="150px"   align="right"/>
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCodigo)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearchProducto')"  width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFamilia)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProveedor)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaalta)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterStock)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterIva)" instant="true" onChange="@command('doSearchProducto')"  width="95%"/>
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_producto">
+                <listitem value="@load(zk_producto)" onDoubleClick="@command('modificarProducto')" tooltip="${zk_producto.codigo}" >
+                    <listcell label="@load(zk_producto.codigo)" >
+                        <popup id="${zk_producto.codigo}"  if="${zk_producto.fotografia != 'null' and zk_producto.fotografia != NULL}">
+                            <html>
+                                <image src="${zk_producto.fotografia}" width="150px" height="150px"/>
+                            </html>
+                        </popup>
+                    </listcell>
+                    <listcell label="@load(zk_producto.nombre)" />
+                    <listcell label="@load(zk_producto.familia.nombre)" />
+                    <listcell label="@load(zk_producto.proveedor.nombre)" />
+                    <listcell label="@load(zk_producto.fecha_alta)"  />
+                    <listcell label="@load(zk_producto.stock)" />
+                    <listcell label="@load(zk_producto.iva.valor)" />
+                    <listcell label="@load(zk_producto.precio) @converter('formatedNumber', format='#,##0.00 €')"  />
+                    <listcell label="@load(zk_producto.pvp) @converter('formatedNumber', format='#,##0.00 €')" />
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

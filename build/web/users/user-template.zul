@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <borderlayout id="main" height="850px">
+        <center hflex="true" vflex="true" >
+            <div>
+                <include src="user-lista.zul"/>
+            </div>
+        </center>
+    </borderlayout>
+</zk>

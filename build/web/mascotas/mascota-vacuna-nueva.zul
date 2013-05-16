@@ -1,0 +1,67 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+    <window id="mascotavacunanueva" 
+            title="Vacuna Nueva" 
+            border="normal"
+            width="500px" 
+            height="auto" 
+            minimizable="false" 
+            maximizable="false"
+            mode="modal"  
+            closable="true" 
+            action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.mascota_vacuna.MascotaVacunaViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+    <menubar id="menu" >
+        <menuitem id="send" 
+                  image="/images/guardar.png" 
+                  label="Guardar" 
+                  tooltiptext="Guardar" >
+            <attribute name="onClick">
+                vm.send();
+                mascotavacunanueva.detach();
+            </attribute>
+        </menuitem>
+        </menubar>
+        <style src="../estilos/listbox20h.css" />
+        <grid id="mygrp"
+              form="@id('zk_vacuna') @save(vm.newEvent, before='send') ">
+            <columns>
+                <column label="" width="100px" align="right"/>
+                <column label="" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="Mascota" />
+                    <textbox id="txtNombre" 
+                                value="@load(vm.selectedMascota.nombre)"
+                                cols="25"
+                                width="195px"
+                                readonly="true"/>
+                </row>
+                <row>
+                    <label value="Vacunas"/>
+                    <listbox id="box" 
+                            model="@bind(vm.vacunas)"
+                            selectedItems="@bind(vm.selectedVacunas)"
+                            multiple="true" 
+                            checkmark="true">
+                        <listhead>
+                            <listheader label="" sort="auto(nombre)"/>
+                            <listheader label="" sort="auto(dias)" width="100px" align="center"/>
+                            <!--<listheader label="" sort="auto(veterinario)" />-->
+                        </listhead>
+                        <template name="model" var="zk_vacuna">
+                            <listitem value="@load(zk_vacuna)"  onOK="@command('send')" >
+                                <listcell label="@load(zk_vacuna.nombre)" />
+                                <listcell label="@load(zk_vacuna.dias) @converter('formatedNumber', format='### días')" />
+                                <!--<listcell label="@load(zk_vacuna.veterinario.nombre)" />-->
+                            </listitem>
+                        </template>
+                    </listbox>
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

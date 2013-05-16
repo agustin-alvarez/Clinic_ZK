@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winproveedornuevo" title="Proveedor Nuevo" border="normal"
+            width="500px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.proveedores.ProveedorViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+
+                    winproveedornuevo.setVisible(true);
+                }
+
+        </zscript>
+<!--        <div><include src="../${menu}"/></div>-->
+        <menubar id="menu" >
+            <menuitem id="add" label="Guardar" image="../images/guardar.png" 
+                      onClick="@command('add')"
+                      autodisable="+self, +txtNIF, +txtNombre, +txtDireccion, +provincias,
+                                   +poblaciones, +intTelefono, +intTelefono2, +txtEmail">
+                <attribute name="onClick">
+                    <![CDATA[
+                    
+                    ]]>
+                </attribute>
+            </menuitem>
+
+        </menubar>
+        <grid id="mygrp"
+              form="@id('zk_proveedor') @load(vm.selectedEvent)
+                    @save(vm.newEvent, before='add')">
+            <columns>
+                <column label="Datos del Proveedor" width="150px" align="left"/>
+                <column label="" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="CIF *" width="150px" />
+                    <textbox id="txtNIF"
+                             cols="25"
+                             value="@bind(zk_proveedor.nif)"
+                             width="195px"
+                             maxlength="9"
+                             constraint="/^([X|x](-|\.)?0?\d{7}(-|\.)?[A-Za-z]|[A-Za-z](-|\.)?\d{7}(-|\.)?[0-9A-Za-z]|\d{8}(-|\.)?[A-Za-z])$/: CIF incorrecto" 
+                    />
+                </row>
+                <row>
+                    <label value="Nombre *" width="150px" />
+                    <textbox id="txtNombre"
+                             cols="25"
+                             value="@bind(zk_proveedor.nombre)"
+                             width="195px"
+                             constraint="no empty" />
+                </row>
+                <row>
+                    <label value="Dirección *" width="150px" />
+                    <textbox id="txtDireccion"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_proveedor.direccion)"
+                             constraint="no empty"/>
+                </row>
+                <row>
+                    <label value="Provincia *" width="150px" />
+                    <selectbox id="provincias"
+                              model="@load(vm.provincias)"
+                              selectedItem="@bind(vm.selectedProvincia)
+                                            @bind(zk_proveedor.provincia)"
+                              onSelect="@command('onSelectProvincia')"
+                              width="200px" >
+                        <template name="model">
+                            <label value="@bind(each.provincia)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Población *" width="150px" />
+                    <selectbox id="poblaciones"
+                              model="@load(vm.allPoblaciones)"
+                              selectedItem="@bind(zk_proveedor.poblacion)"
+                              width="200px" >
+                        <template name="model">
+                            <label value="@bind(each.poblacion)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Teléfono *" width="150px" />
+                    <textbox id="intTelefono"
+                            cols="25"
+                            width="195px"
+                            value="@bind(zk_proveedor.telefono)"
+                            maxlength="9"
+                            constraint="no empty, no negative, end_before, /^[9|6|7][0-9]{8}$/: Teléfono no válido"/>
+                </row>
+                <row>
+                    <label value="Teléfono 2" width="150px" />
+                    <textbox id="intTelefono2"
+                            cols="25"
+                            width="195px"
+                            maxlength="9"
+                            value="@bind(zk_proveedor.telefono2)"
+                            style="margin-right:15px;"
+                    />
+                </row>
+                <row>
+                    <label value="Fax" width="150px" />
+                    <textbox id="intFax"
+                            cols="25"
+                            width="195px"
+                            maxlength="9"
+                            value="@bind(zk_proveedor.fax)"
+                            style="margin-right:15px;"
+                    />
+                </row>
+                <row>
+                    <label value="Email *" />
+                    <textbox id="txtEmail"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_proveedor.email)"
+                             constraint="/.+@.+\.[a-z]+/: Por favor, introduce una dirección de e-mail"
+                    />
+                </row>
+                <row>
+                    <label value="Contacto" />
+                    <textbox id="txtContacto"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_proveedor.contacto)"
+                    />
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window id="win" 
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.productos.ProductoViewModel')"
+            validationMessages="@id('vmsgs')" 
+            visible="false" vflex="1" hflex="1">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+                    
+                    win.setVisible(true);
+                }
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <panel title="Alerta Stock Bajo" border="normal" >
+            <panelchildren>
+                <listbox id="box" 
+                         mold="paging"
+                         pageSize="16" 
+                         rows="16" 
+                         emptyMessage="Ningún ítem encontrado"
+                         model="@bind(vm.getAvisoProducto())" 
+                         height="565px">
+                    <listhead>
+                        <listheader label="Código"      sort="auto(codigo)" width="120px"/>
+                        <listheader label="Nombre"      sort="auto(nombre)" width="182px"/>
+                        <listheader label="Proveedor"   sort="auto(proveedor)" width="180px"/>
+                        <listheader label="Stock"       sort="auto(stock)" width="80px" align="center"/>
+                        <listheader label="PVP"         sort="auto(pvp)" width="100px" align="right"/>
+                    </listhead>
+                    <template name="model" var="zk_producto">
+                        <listitem value="@load(zk_producto)"  >
+                            <listcell label="@load(zk_producto.codigo)"  style="color: red"/>
+                            <listcell label="@load(zk_producto.nombre)" style="color: red"/>
+                            <listcell label="@load(zk_producto.proveedor.nombre)" style="color: red"/>
+                            <listcell label="@load(zk_producto.stock)" style="color: red"/>
+                            <listcell label="@load(zk_producto.pvp) @converter('formatedNumber', format='#,##0.00 €')" style="color: red"/>
+                        </listitem>
+                    </template>
+                </listbox>
+            </panelchildren>
+        </panel>
+    </window>
+</zk>

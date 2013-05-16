@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+    <window id="win" 
+            title="Mascotas" 
+            border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.mascotas.MascotaViewModel')"
+            visible="false">
+        <zscript>
+            <![CDATA[
+                import org.zkoss.zk.ui.*;
+                import es.clinica.veterinaria.user.*;
+
+                Session s = Sessions.getCurrent();
+                String menu = "menu.zul";
+
+                void logout() {
+                    s.invalidate();
+                    Executions.sendRedirect("../index.zul");
+                }
+
+                if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                    Executions.sendRedirect("../index.zul");
+                else{
+                        if(UserCredentialManager.getIntance(session).getRol() == 1)
+                            menu = "menu-admin.zul";
+
+                        win.setVisible(true);
+                    }
+            ]]>
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <div><include src="../${menu}"/></div>
+        <menubar id="menu" >
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar"   
+                      disabled="@load(empty vm.selectedEvent)"
+                      tooltiptext="Eliminar">
+                <attribute name="onClick">
+                    <![CDATA[
+                        Messagebox.show("¿Desea elimimar " + vm.selectedEvent.getNombre() + " ?",
+                        "Advertencia", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                            new org.zkoss.zk.ui.event.EventListener(){
+                                public void onEvent(Event e){
+                                    if(Messagebox.ON_OK.equals(e.getName())){
+                                        vm.delete();
+                                        Executions.sendRedirect("mascota-template.zul");
+                                    }else if(Messagebox.ON_CANCEL.equals(e.getName())){
+                                        delete.setDisabled(true);
+                                    }
+                                }
+                            }
+                        );
+                    ]]>
+                </attribute>
+            </menuitem>
+       </menubar>
+        <!--<div width="750px" height="453px"></div>-->
+        
+        <listbox id="box" 
+                 mold="paging"
+                 pageSize="14" 
+                 rows="14" 
+                 model="@bind(vm.mascotas)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ningún ítem encontrado">
+            <listhead>
+                <listheader label="Nº Chip"          sort="auto(chip)"              width="150px" />
+                <listheader label="Nombre"           sort="auto(nombre)"            width="180px" />
+                <listheader label="Propietario"      sort="auto(cliente.fullname)"  width="180px" />
+                <listheader label="Sexo"             sort="auto(sexo)"              width="100px" />
+                <listheader label="F. Nacimiento"    sort="auto(nacimiento)"        width="100px" />
+                <listheader label="F. Defuncion"     sort="auto(defuncion)"         width="100px" />
+                <!--<listheader label="Peso (kg)"        sort="auto(peso)" align="center"/>-->
+                <!--<listheader label="Altura (cm)"      sort="auto(altura)" align="center"/>-->
+                <listheader label="Raza"             sort="auto(raza.raza)"         width="150px" />
+                <listheader label="Especie"          sort="auto(especie.especie)"   width="120px" />
+                <!--<listheader label="Pelo"             sort="auto(pelo)" />-->
+                <listheader label="Fecha Alta"       sort="auto(fechaalta)"         width="120px" />
+                <listheader label="Fecha Baja"       sort="auto(fechabaja)"         width="120px" />
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterChip)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterPropietario)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterSexo)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFnacimiento)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFdefuncion)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+<!--                <auxheader>
+                    <textbox value="@bind(vm.filterPeso)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>-->
+<!--                <auxheader>
+                    <textbox value="@bind(vm.filterAltura)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>-->
+                <auxheader>
+                    <textbox value="@bind(vm.filterRaza)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEspecie)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+<!--                <auxheader>
+                    <textbox value="@bind(vm.filterPelo)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>-->
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaalta)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechabaja)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+            </auxhead>
+            <template name="model" var="zk_mascota">
+                <listitem value="@load(zk_mascota)" onDoubleClick="@command('showMascota')" >
+                    <listcell label="@load(zk_mascota.chip)"   context="${zk_mascota.chip}"> 
+                        <menupopup id="${zk_mascota.chip}">
+                            <menuitem label="Ir a"              
+                                      onClick="@command('showMascota')"
+                                      src="../images/page_go.png"
+                                      
+                            />
+                            <menuitem label="Ver Pesos"
+                                      onClick="@command('mostrarPeso')" 
+                                      src="../images/weight.png"/>
+                            <!--<menuitem label="Ir a Historial"    onClick="@command('showHistorial')" />-->
+                            <!-- Obsoleto, se pasa a su perfil
+                            <menuitem label="Modificar" href="mascota-nuevo.zul?chip=${zk_mascota.chip}"  />-->
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_mascota.nombre)"          context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.cliente.fullname)"  context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.sexo)"            context="${zk_mascota.chip}"  if="${zk_mascota.sexo == 'Macho'}"  src="/images/male.png" />
+                    <listcell label="@load(zk_mascota.sexo)"            context="${zk_mascota.chip}"  if="${zk_mascota.sexo == 'Hembra'}"  src="/images/female.png" />
+                    <listcell label="@load(zk_mascota.nacimiento)"      context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.defuncion)"       context="${zk_mascota.chip}"/>
+                    <!--<listcell label="@load(zk_mascota.peso) @converter('formatedNumber', format='###,##')"            context="${zk_mascota.chip}"/>-->
+                    <!--<listcell label="@load(zk_mascota.altura) @converter('formatedNumber', format='###,##')"          context="${zk_mascota.chip}"/>-->
+                    <listcell label="@load(zk_mascota.raza.raza)"       context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.especie.especie)" context="${zk_mascota.chip}"/>
+                    <!--<listcell label="@load(zk_mascota.pelo)"            context="${zk_mascota.chip}"/>-->
+                    <listcell label="@load(zk_mascota.fechaalta)"       context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.fechabaja)"       context="${zk_mascota.chip}"/>
+                </listitem>
+            </template>
+        </listbox>
+
+    </window>
+</zk>

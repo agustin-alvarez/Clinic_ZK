@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winproductomodificar" title="Modificar Producto" border="normal"
+            width="500px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            onCancel="winproductomodificar.detach()"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.productos.ProductoViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+
+                    winproductomodificar.setVisible(true);
+                }
+
+        </zscript>
+<!--        <div><include src="../${menu}"/></div>-->
+        <menubar id="menu" >
+            <menuitem id="add" 
+                      label="Guardar" 
+                      image="../images/guardar.png"  
+                      onClick="@command('update')"
+                      autodisable="+self, +txtNIF, +txtNombre, +cmbFamilia, +cmbProveedor, +cmbIva,
+                                     +dbxPvp, +txtStock, +btnImagen, +dbxPrecio, +txtbxIva" />
+                
+        </menubar>
+        <grid id="mygrp"
+              form="@id('zk_producto') 
+                    @load(vm.selectedEvent) 
+                    @save(vm.selectedEvent, before='update')">
+            <columns>
+                <column label="Datos del Producto" width="150px" align="left"/>
+                <column label="" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="Código" width="150px" />
+                    <textbox id="txtNIF" cols="25" value="@bind(zk_producto.codigo)" width="195px" readonly="true" />
+                </row>
+                <row>
+                    <label value="Nombre" width="150px" />
+                    <textbox id="txtNombre" 
+                             cols="25" 
+                             value="@bind(zk_producto.nombre)" 
+                             width="195px" 
+                             readonly="true" 
+                             constraint="no empty"/>
+                </row>
+                <row>
+                    <label value="Familia" width="150px" />
+                    <textbox id="cmbFamilia" 
+                             value="@load(zk_producto.familia.nombre)" 
+                             cols="25" 
+                             width="195px" 
+                             readonly="true" />
+                </row>
+                <row>
+                    <label value="Proveedor" width="150px" />
+                    <textbox id="cmbProveedor" value="@load(zk_producto.proveedor.nombre)" cols="25" width="195px" readonly="true"/>
+                </row>
+                <row id="rowtxtIva">
+                    <label value="IVA" width="200px" />
+                    <textbox id="txtbxIva" value="@load(zk_producto.iva.valor)" width="200px"  readonly="true">
+                        <attribute name="onClick">
+                            rowtxtIva.setVisible(false);
+                            rowIva.setVisible(true);
+                        </attribute>
+                    </textbox>
+                </row>
+                <row id="rowIva" visible="false">
+                    <label value="IVA" width="200px" />
+                    <selectbox id="cmbIva"
+                              model="@load(vm.ivas)" 
+                              selectedItem="@bind(zk_producto.iva)"  
+                              width="200px">
+                        <template name="model">
+                            <label value="@bind(each.valor)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Precio" width="200px" />
+                    <doublebox id="dbxPrecio" 
+                               cols="25" 
+                               value="@bind(zk_producto.precio)" 
+                               width="195px" format="#,##0.##" 
+                               constraint="no empty, no zero"/>
+                </row>
+                <row>
+                    <label value="PVP" width="200px" />
+                    <doublebox id="dbxPvp"     
+                               cols="25" 
+                               value="@bind(zk_producto.pvp)" 
+                               width="195px" 
+                               format="#,##0.##"
+                               constraint="no empty, no zero"/>
+                </row>
+                
+                <row>
+                    <label value="Stock" width="200px" />
+                    <intbox id="txtStock"      
+                            cols="25" 
+                            value="@bind(zk_producto.stock)" 
+                            width="195px"
+                               constraint="no empty, no zero"/>
+                </row>
+                <row>
+                    <label value="Imagen" />
+                    <button id="btnImagen"
+                            label="Añadir Imagen"
+                            upload="true,maxsize=8192"
+                            onUpload="@command('uploadFile',upload=event)"
+                            autodisable="self" 
+                            src="../images/paperclip.png"/>
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

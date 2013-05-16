@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window id="win" 
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.citas.CitaViewModel')"
+            visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+                    
+                    win.setVisible(true);
+                }
+        </zscript>
+        <style src="../estilos/listbox20h.css"/>
+        <panel title="Alerta citas próximas" border="normal" >
+            <panelchildren>
+                <listbox id="box" 
+                         mold="paging" 
+                         pageSize="16" 
+                         rows="16" 
+                         emptyMessage="Ningún ítem encontrado"
+                         model="@bind(vm.avisoCita)" 
+                         selectedItem="@bind(vm.selectedEvent)" 
+                         height="565px">
+                    <listhead>
+                        <listheader label="Estado" sort="auto(estado)" width="90px" align="center"/>
+                        <listheader label="Fecha"       sort="auto(fecha)"  width="80px" />
+                        <listheader label="Hora"        sort="auto(hora)"   width="70px"/>
+                        <listheader label="Cliente"     sort="auto(cliente.fullname)"   />
+                        <listheader label="Teléfono"    width="80px"/>
+                        <listheader label="Mascota"     sort="auto(mascota.nombre)" width="90px"/>
+                   </listhead>
+                   <template name="model" var="zk_cita">
+                        <listitem value="@load(zk_cita)">
+                            <listcell label="Avisado"   tooltiptext="Avisado"    if="${zk_cita.estado == '3'}" src="/images/telephone.png" context="${zk_cita.id}"/> <!-- CANCELADO -->
+                            <listcell label="Cancelado" tooltiptext="Cancelado"  if="${zk_cita.estado == '0'}" src="/images/delete_1.png" context="${zk_cita.id}"/> <!-- CANCELADO -->
+                            <listcell label="Acudido"   tooltiptext="Acudido"    if="${zk_cita.estado == '1'}" src="/images/accept.png" context="${zk_cita.id}"/> <!-- ACUDIDO -->
+                            <listcell label="Pendiente" tooltiptext="Pendiente"  if="${zk_cita.estado == '2'}" src="/images/error.png" context="${zk_cita.id}"/> <!-- PENDIENTE -->
+                            <listcell label="@load(zk_cita.fecha)" context="${zk_cita.id}">
+                                <menupopup id="${zk_cita.id}">
+                                    <menu label="Cambiar estado" >
+                                        <menupopup>
+                                            <menuitem label="Avisado"  src="/images/telephone.png"  onClick="@command('avisadoCita')" />
+                                            <menuitem label="Acudido"   src="/images/accept.png"    onClick="@command('acudidoCita')"/>
+                                            <menuitem label="Pendiente" src="/images/error.png"     onClick="@command('pendienteCita')" />
+                                            <menuitem label="Cancelar"  src="/images/delete_1.png"  onClick="@command('canceladoCita')" />
+                                        </menupopup>
+                                    </menu>
+                                </menupopup>
+                            </listcell>
+                            <listcell label="@load(zk_cita.hora)"  context="${zk_cita.id}"/>
+                            <listcell label="@load(zk_cita.cliente.fullname)" context="${zk_cita.id}" />
+                            <listcell label="@load(zk_cita.cliente.telefono)" context="${zk_cita.id}" />
+                            <listcell label="@load(zk_cita.mascota.nombre)"  context="${zk_cita.id}" />
+                        </listitem>
+                   </template>
+               </listbox>
+            </panelchildren>
+        </panel>
+    </window>
+</zk>

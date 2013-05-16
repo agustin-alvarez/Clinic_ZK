@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winventalinea" title="Línea de Factura" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.facturas.FacturaDetalladoVM')"
+            validationMessages="@id('vmsgs')"  visible="false">
+         <style src="../estilos/listbox20h.css"/>
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+
+                    winventalinea.setVisible(true);
+                }
+        </zscript>
+        <div><include src="../${menu}"/></div>
+        <menubar id="menu" >
+            <menuitem image="../images/goback.png"
+                      onClick='Executions.sendRedirect("../facturas/factura-template.zul")'
+                      label="Atrás"/>
+            <menuitem label="Generar Factura"
+                      image="../images/page_white_text.png"
+                      onClick="@command('crearFactura')"
+                      disabled="@load(empty vm.selectedVenta)"/>
+            <menuitem label="Descargar Factura"
+                      image="../images/download.png"
+                      onClick="@command('descargarFactura')"/>
+            <menuitem id="delete"
+                      image="../images/delete.png"
+                      label="Eliminar"
+                      onClick="@command('delete')"
+                      disabled="@load(empty vm.selectedEvent)" />
+        </menubar>
+        <groupbox id="grpcli" form="@id('zk_venta') @load(vm.selectedFactura)" closable="false">
+            <caption label="Venta Descripción" />
+            <div style="margin-bottom:10px">
+                Número:
+                <intbox cols="20"
+                        value="@bind(vm.selectedFactura.numero)"
+                        style="margin-left:20px; margin-right: 15px" 
+                        onChange="@command('updatenumero')"/>
+                Cliente:
+                <textbox id="bnxCliente"
+                         cols="25"
+                         value="@bind(vm.selectedFactura.cliente.fullname)"
+                         style="margin-right: 10px" 
+                         readonly="true" />
+<!--                    <attribute name="onOpen">
+                        <![CDATA[
+                            import java.util.HashMap;
+                            import org.zkoss.zk.ui.Component;
+                            import org.zkoss.zk.ui.Executions;
+                            Executions.createComponents("venta-buscarcliente.zul", null, null);
+                        ]]>
+                    </attribute>
+                </bandbox>-->
+
+                Fecha:
+                    <datebox onChange="@command('updatefecha')"
+                             cols="20"
+                             value="@bind(vm.selectedFactura.fecha)"
+                             style="margin-left: 10px; margin-right:15px;" 
+                             readonly="true"/>
+            </div>
+        </groupbox>
+        <listbox id="box"
+                 mold="paging"
+                 pageSize="11"
+                 rows="11"
+                 multiple="true"
+                 model="@load(vm.ventalineas)"
+                 selectedItem="@bind(vm.selectedEvent)" >
+            <listhead>
+                <listheader label="Código"      sort="auto(codigo)" width="100px"/>
+                <listheader label="Nombre"      sort="auto(nombre)" />
+                <listheader label="Fecha"       sort="auto(fecha)" width="100px" align="center"/>
+                <listheader label="Tipo"        sort="auto(tipo)"  width="120px" align="center"/>
+                <listheader label="Descripción" sort="auto(descripcion)" />
+                <listheader label="Cantidad"    sort="auto(cantidad)"           width="100px" align="right"/>
+                <listheader label="PVP"         sort="auto(pvp)"    width="120px" align="right"/>
+                <listheader label="IVA %"       sort="auto(iva)"    width="80px" align="center"/>
+                <listheader label="Precio total"   width="120px" align="right" />
+            </listhead>
+            <template name="model" var="zk_ventalinea">
+                <listitem value="@load(zk_ventalinea)">
+                    <listcell label="@load(zk_ventalinea.codigo)" />
+                    <listcell label="@load(zk_ventalinea.nombre)" />
+                    <listcell label="@load(zk_ventalinea.fecha)" />
+                    <listcell label="Producto" src="../images/tag_blue.png" if="${zk_ventalinea.tipo == 1}"/>
+                    <listcell label="Servicio" src="../images/brick.png" if="${zk_ventalinea.tipo == 2}"/>
+                    <listcell label="@load(zk_ventalinea.descripcion)"
+                              if="${zk_ventalinea.descripcion != 'null'}"/>
+                    <listcell label=""
+                              if="${zk_ventalinea.descripcion == 'null'}"/>
+                    <listcell label="@load(zk_ventalinea.cantidad)" />
+                    <listcell label="@load(zk_ventalinea.pvp) @converter('formatedNumber', format='#,##0.00 €')" />
+                    <listcell label="@load(zk_ventalinea.iva)" />
+                    <listcell label="@load(zk_ventalinea.preciototal) @converter('formatedNumber', format='#,##0.00 €')"/>
+                </listitem>
+            </template>
+        </listbox>
+        <hbox height="100px" style="float:right">
+            <groupbox form="@id('zk_ventalinea') 
+                            @load(vm.selectedEvent)
+                            @save(vm.selectedEvent, before='update')
+                            @save(vm.newEvent, before='add')"
+                      closable="false"
+                      height="95px"
+                      style="float:right; margin-left: 20px">
+                <caption label="Venta" />
+                <div style="margin-bottom:10px; margin-top: 20px">
+                    <!--<label value="Fecha:" />-->
+                    <bandbox autodrop="false"
+                             cols="25"
+                             value="@bind(vm.selectedEvent.fecha) @converter('formatedDate', format='dd-MM-yyyy')"
+                             style="margin-left:11px; margin-right: 10px;"
+                             readonly="true" >
+                        <attribute name="onOpen">
+                            <![CDATA[
+                                import java.util.HashMap;
+                                import org.zkoss.zk.ui.Component;
+                                import org.zkoss.zk.ui.Executions;
+                                Map map = new HashMap();
+                                map.put("selectedFactura", vm.selectedFactura);
+                                Executions.createComponents("factura-buscarventa.zul", null, map);
+                            ]]>
+                        </attribute>
+                    </bandbox>
+                </div>
+
+            </groupbox>
+            <groupbox closable="false"
+                      width="300px" 
+                      height="90px"
+                      style="float:right; 
+                             margin-top: 5px; 
+                             margin-left: 20px" >
+                    <hbox style="margin-top: 10px">
+                        <label value="Total:" 
+                               style="font-size: 30px; 
+                                      margin-top: 20px"/>
+                        <doublebox value="@load(vm.costeventalineas)" 
+                                   format="#,##0.## €"
+                                   width="180px"
+                                   readonly="true" 
+                                   style="font-size: 20px; 
+                                          float: right; 
+                                          text-align: right; 
+                                          vertical-align: center"/>
+                    </hbox>
+                    <hbox style="float: right; margin-right: 21px">
+                        <label value="IVA:" 
+                               style="font-size: 20px; 
+                                      margin-top: 20px;
+                                      padding-left: 20px"/>
+                        <doublebox value="@load(vm.iva)" 
+                           format="#,##0.## €"
+                           width="100px"
+                           readonly="true" 
+                           style="font-size: 15px; 
+                                  float: right; 
+                                  text-align: right; 
+                                  vertical-align: center"/>
+                    </hbox>
+            </groupbox>
+        </hbox>
+    </window>
+</zk>

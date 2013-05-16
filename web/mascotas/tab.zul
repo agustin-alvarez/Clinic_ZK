@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window>
+        <div><include src="../menu-admin.zul"/></div>
+        <menubar id="menu" >
+            <menuitem image="../images/goback.png" onClick='Executions.sendRedirect("venta-template.zul")' label="Atrás"/>
+            <menuitem id="add"      image="../images/nuevo.png"     label="Nuevo"       onClick="@command('add')"/>
+            <menuitem id="update"   image="../images/guardar.png"   label="Guardar"     onClick="@command('update'), Desactivar()" disabled="@load(empty vm.selectedEvent)"/>
+            <menuseparator />
+            <menuitem id="activar"  image="../images/modificar.png" label="Modificar"   onClick="Activar()"/>
+            <menuitem id="delete"   image="../images/delete.png"    label="Eliminar"    onClick="@command('delete')" disabled="@load(empty vm.selectedEvent)" />
+        </menubar>
+        <tabbox id="tb" width="100%"  mold="accordion">
+            <tabs>
+                <tab label="Tab 1" />
+                <tab label="Tab 2" />
+                <tab label="Tab 3" />
+                <tab label="Estadisticas" />
+                <tab label="JasperReports" />
+            </tabs>
+            
+            <tabpanels>
+                <tabpanel>
+                    <grid id="grid" mold="paging" pageSize="4">
+                        <columns>
+                            <column hflex="1" label="Order #" align="left" />
+                            <column hflex="2" label="Item Purchased" align="center" />
+                            <column hflex="3" label="Purchased Time" align="center" />
+                            <column hflex="1" label="Paid" align="right" />
+                        </columns>
+                        <rows>
+                            <zscript><![CDATA[
+                                import org.zkoss.zul.*; 
+                                int[] orderArray = new int[12];
+                                for (int j=0; j<12; j++){
+                                    orderArray[j]= 390 + j;
+                                }
+                            ]]></zscript>
+                            <row forEach="${orderArray}">
+                                <label value="${each}" />
+                                <listbox mold="select" >
+                                    <listitem label="Java" />
+                                    <listitem label="Latte" />
+                                    <listitem label="Mocha" />
+                                </listbox>
+                                <timebox cols="12" format="a hh:mm:ss" mold="rounded"
+                                    onCreate="self.value = new Date()" />
+                                <checkbox label="No" onCheck='self.label= self.isChecked()? "Yes" : "No"' />
+                            </row>
+                        </rows>
+                    </grid>
+                </tabpanel>
+                <tabpanel>
+                    <include src="auxhead1.zul" />
+                </tabpanel>
+                <tabpanel>
+                    <include src="auxhead2.zul" />
+                </tabpanel>
+                <tabpanel>
+                    <vbox>
+                        <grid width="400px">
+                            <columns>
+                                <column label="category" width="150px" />
+                                <column label="value" />
+                            </columns>
+                            <rows>
+                                <row>
+                                    <label id="c0" value="C/C++" />
+                                    <doublebox id="v0" value="21.2" constraint="no empty"
+                                            onChange="update(0)" />
+                                </row>
+                                <row>
+                                    <label id="c1" value="VB" />
+                                    <doublebox id="v1" value="10.2" constraint="no empty"
+                                            onChange="update(1)" />
+                                </row>
+                                <row>
+                                    <label id="c2" value="Java" />
+                                    <doublebox id="v2" value="40.4" constraint="no empty"
+                                            onChange="update(2)" />
+                                </row>
+                                <row>
+                                    <label id="c3" value="PHP" />
+                                    <doublebox id="v3" value="28.2" constraint="no empty"
+                                            onChange="update(3)" />
+                                </row>
+                            </rows>
+                        </grid>
+                        <flashchart id="mychart" width="400" height="250"
+                                    type="pie">
+                            <zscript>
+                                    void update(int rowIndex) {
+                                            Label lb = (Label) self.getFellow("c"+rowIndex);
+                                            Doublebox db = (Doublebox) self.getFellow("v"+rowIndex);
+                                            model.setValue(lb.value, new Double(db.getValue().doubleValue()));
+                                    }  
+                                    PieModel model = new SimplePieModel();
+                                    for(int j=0; j &lt; 4; ++j) {
+                                            update(j);
+                                    }
+                                    mychart.setModel(model);
+                            </zscript>
+                        </flashchart>
+                        <!--<toolbarbutton label="See More chart..." href="/data/moreflashchart.zul" target="zksandbox"/>-->
+                    </vbox>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </window>
+</zk>

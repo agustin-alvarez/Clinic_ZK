@@ -1,0 +1,89 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winbuscarventa" title="Productos" border="normal"
+            width="800px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            onCancel="winbuscarventa.detach()"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.ventas.VentaFacturaVM')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="send"  
+                      image="/images/check_box.png"  
+                      label="Confirmar"  
+                      disabled="@load(empty vm.selectedItems)" 
+                      tooltiptext="Enviar">
+                <attribute name="onClick">
+                    vm.sendVentas(); 
+                    winbuscarventa.detach();
+                </attribute>
+            </menuitem>
+        </menubar>
+        <listbox id="box" 
+                 model="@bind(vm.ventas)"
+                 selectedItems="@bind(vm.selectedItems)"
+                 mold="paging" 
+                 pageSize="8" 
+                 multiple="true" 
+                 checkmark="true"
+                 rows="8" >
+            <listhead>
+                <!--<listheader label="Número"          sort="auto(id)" width="7%" />-->
+                <listheader label="Fecha"           sort="auto(fecha)" align="center" width="20%"/>
+                <listheader label="Hora"            sort="auto(hora)"  align="center" width="8%"/>
+                <listheader label="Cliente"         sort="auto(cliente.fullname)" />
+
+
+                <listheader label="Artículos"       sort="auto(num_articulos)"      align="center"      width="7%"/>
+                <listheader label="Coste total"     sort="auto(coste)"              align="right"       width="10%"/>
+                <listheader label="Le atendió"      sort="auto(vendedor.nombre)"    align="center"      width="12%"/>
+                <listheader label="Le sirvió"       sort="auto(veterinario.nombre)" align="center"      width="12%"/>
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFecha)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"
+                             style="margin-left: 2%"/>
+                </auxheader>
+                <auxheader/>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCliente)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"
+                             style="margin-left: 2%"/>
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEmpleado)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"
+                             style="margin-left: 2%"/>
+                </auxheader>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_venta">
+                <listitem value="@load(zk_venta)" onDoubleClick="@command('showVentaLinea')">
+                    <!--<listcell label="@load(zk_venta.id)" context="${zk_venta.id}"/>-->
+                    <listcell label="@load(zk_venta.fecha)"             context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.hora) @converter('formatedDate', format='HH:mm') "  context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.cliente.fullname)"  context="${zk_venta.id}" >
+                        <menupopup id="${zk_venta.id}">
+                            <menuitem label="Ir a"
+                                      onClick="@command('showVentaLinea')"
+                                      src="../images/page_go.png" />
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_venta.num_articulos)"         context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.coste) @converter('formatedNumber', format='#,##0.00 €')" context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.vendedor.nombre)"       context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.veterinario.nombre)"    context="${zk_venta.id}"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

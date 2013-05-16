@@ -1,0 +1,55 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win-productofamilia-nueva" title="Familia Producto Nuevo" border="normal"
+            width="600px" height="600px" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.producto_familia.ProductoFamiliaViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="add"    image="/images/nuevo.png"   label="Nuevo"     onClick="@command('add')" tooltiptext="Nuevo"/>
+            <menuitem id="update" image="/images/guardar.png" label="Modificar" onClick="@command('update')" disabled="@load(empty vm.selectedEvent)" tooltiptext="Modificar" />
+        </menubar>
+        <listbox id="box" mold="paging" pageSize="12" multiple="true" rows="12" model="@bind(vm.events)" height="400px"
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <!--<listheader label="Número"  sort="auto(id)" width="80px"    />-->
+                <listheader label="Familia" sort="auto(nombre)" />
+                <listheader label="Tratamiento" sort="auto(tratamieto)" width="90px" align="center"/>
+                <listheader label="Descripción" />
+            </listhead>
+            <template name="model" var="zk_familia">
+                <listitem value="@load(zk_familia)">
+                    <!--<listcell label="@load(zk_familia.id)" />-->
+                    <listcell label="@load(zk_familia.nombre)" />
+                    <listcell label="Sí" if="${zk_familia.tratamiento eq true}"  />
+                    <listcell label="No" if="${zk_familia.tratamiento eq false}" />
+                    <listcell label="@load(zk_familia.descripcion)"  />
+                </listitem>
+            </template>
+        </listbox>
+        <groupbox id="mygrp"
+                  form="@id('zk_familia') @load(vm.selectedEvent) @save(vm.selectedEvent, before='update') 
+                        @save(vm.newEvent, before='add') " height="120px" closable="false">
+            <caption label="Familia producto nuevo" />
+            <div style="margin-top: 5px">
+                <div>
+                    <label value="Familia:"  style="float:left" /> 
+                    <textbox id="txtFamilia"   cols="35" value="@bind(zk_familia.nombre)" style="margin-left: 33px; margin-right:15px" constraint="no empty"/>
+                    <checkbox checked="@bind(zk_familia.tratamiento)" />
+                    <label value="Tratamiento" /> 
+                </div>
+                <div style="margin-top: 10px">
+                    <label value="Descripcion:" style="float: left; padding-bottom:50px; margin-right: 10px"/> 
+                    <textbox id="txtDescripcion" value="@bind(zk_familia.descripcion)" rows="3" width="350px" />
+                </div>
+            </div>
+           <!-- Fecha Alta:
+                <datebox id="dateFechaAlta" cols="8" value="@bind(zk_producto.fecha_alta)" />-->
+            <hlayout>
+                <label style="color:red" value="@load(vmsgs['id'])" />
+                <label style="color:red" value="@load(vmsgs['nombre'])" />
+            </hlayout>
+        </groupbox>
+    </window>
+</zk>

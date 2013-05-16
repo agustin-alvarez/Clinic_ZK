@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="wincita" title="Asignar Cita" border="normal"
+            width="600px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.clientes.ClienteCitaVM')"
+            validationMessages="@id('vmsgs')" visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import es.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else
+                wincita.setVisible(true);
+        
+        </zscript>         
+        
+        <menubar>
+            <menuitem id="add" label="Guardar" image="../images/guardar.png"  onClick="@command('sendmascota')" 
+                      autodisable="+self, +txtChip, +dateFecha, +cmbHora, +txtTipo, +txtObs"/>
+        </menubar>
+  
+        <grid id="mygrp"
+              form="@id('zk_cita') @load(vm.selectedEvent) 
+                    @save(vm.newEvent, before='sendmascota') ">
+            <columns>
+                <column label="Datos Cita" width="150px" />
+                <column label="" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="Cliente" width="200px" /> 
+                    <textbox value="@load(vm.selectedEvent.fullname)" readonly="true" width="195px" />
+                </row>
+                <row>
+                    <label value="Mascota" width="200px" /> 
+                    <textbox value="@load(vm.selectedMascota.nombre)" readonly="true" width="195px" />
+                </row>
+                <row>
+                    <label value="Fecha *" width="200px" /> <!-- Solo futuro-->
+                    <datebox id="dateFecha" 
+                             format="dd/MM/yyyy" 
+                             width="200px" 
+                             constraint="no past, no empty"
+                             value="@save(zk_cita.fecha)" 
+                             onChange="@command('onSelectFecha')" 
+                             focus="true" >
+                        <attribute name="onChange">
+                            <![CDATA[
+                                vm.setSelectedFecha(self.getValue());
+                            ]]>
+                        </attribute>
+                    </datebox>
+                </row>
+                <row>
+                    <label value="Hora *" width="200px" /> 
+                    <selectbox id="cmbHora" 
+                               model="@load(vm.horas)"
+                               selectedItem="@save(zk_cita.hora)"  
+                               width="200px">
+                        <template name="model">
+                            <label value="@bind(each)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Servicio" width="200px" /> 
+                    <selectbox id="txtTipo" model="@load(vm.servicios)" 
+                              selectedItem="@save(zk_cita.servicio)"  
+                              width="200px">
+                        <template name="model">
+                            <label value="@bind(each.nombre)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    Informe:
+                    <hlayout>
+                        <textbox id="txtObs" rows="3" width="250px" value="@save(zk_cita.informe)"/>
+                    </hlayout>
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

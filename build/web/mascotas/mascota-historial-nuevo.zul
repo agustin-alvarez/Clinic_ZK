@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winhistorial" title="Historial Nuevo" border="normal"
+            width="1000px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('es.clinica.veterinaria.historial.HistorialViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+        <zscript>
+            <![CDATA[
+                import org.zkoss.zk.ui.*;
+                import es.clinica.veterinaria.user.*;
+
+                Session s = Sessions.getCurrent();
+                String menu = "menu.zul";
+                
+                void logout() {
+                    s.invalidate();
+                    Executions.sendRedirect("../index.zul");
+                }
+
+                if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                    Executions.sendRedirect("../index.zul");
+                else{
+                        if(UserCredentialManager.getIntance(session).getRol() == 1)
+                            menu = "menu-admin.zul";
+
+                        winhistorial.setVisible(true);
+                    }
+            ]]>
+        </zscript>
+        <menubar id="menu" >
+            <menuitem id="add" label="Guardar" image="../images/guardar.png"  onClick="@command('send')"
+                      autodisable="+self"/>
+
+        </menubar>
+        <tabbox id="tabBoxHistorial" width="100%">
+            <tabs>
+                <tab label="Datos" />
+                <!--<tab label="Estadísticas" />-->
+                <tab label="Documentos" />
+                <!--<tab label="Ventas" />-->
+            </tabs>
+            <tabpanels>
+                <tabpanel id="datosHistorial" height="500px">
+                    <grid id="mygrp"
+                          form="@id('zk_historial') @save(vm.newEvent, before='send') ">
+                        <columns>
+                            <column label="" width="120px" align="right"/>
+                            <column label="" />
+                        </columns>
+                        <rows>
+                            <row>
+                                <label value="Mascota" width="150px" />
+                                <textbox id="txtNombre" 
+                                         value="@load(vm.selectedMascota.nombre)"
+                                         cols="25"
+                                         width="195px"
+                                         readonly="true"/>
+                            </row>
+                            <row>
+                                <label value="Peso" width="150px" />
+                                <doublebox id="dbxPeso" 
+                                         value="@bind(vm.peso)"
+                                         cols="25"
+                                         width="195px" 
+                                         format="#,##0.##"  
+                                         constraint="no negative"/>
+                            </row>
+                            <row>
+                                <label value="Tipo de Visita" width="150px" />
+                                <listbox id="lsbTipo"
+                                         mold="select" 
+                                         selectedItem="@bind(zk_historial.tipo)"
+                                         width="195px" 
+                                         style="margin-right: 20px;">
+                                    <listitem label="Normal"    value="0" />
+                                    <listitem label="Urgencias" value="1" />
+                                    <listitem label="Vacunas"   value="2"  />
+                                </listbox>
+                            </row>
+                            <row id="rowAnam">
+                                <label value="Anamnesis" width="150px" />
+                                <textbox id="txtAnamnesis" 
+                                         value="@bind(zk_historial.anamnesis)" 
+                                         width="800px"
+                                         height="200px"
+                                         rows="10" 
+                                         focus="true"/>
+                            </row>
+                            <row id="rowDiag">
+                                <label value="Diagnóstico" width="200px" />
+                                <textbox id="txtDiagnostico"     
+                                         value="@bind(zk_historial.diagnostico)" 
+                                         width="800px"
+                                         rows="2"/>
+                            </row>
+                            <row id="rowTrat">
+                                <label value="Tratamiento" width="200px" />
+                                <textbox id="txtTratamieto"      
+                                         value="@bind(zk_historial.tratamiento)" 
+                                         width="800px"
+                                         rows="4"/>
+                            </row>
+                        </rows>
+                    </grid>
+                </tabpanel>
+                <tabpanel id="imagenesHistorial" 
+                          form="@id('zk_fichero') 
+                                @load(vm.selectedFichero)
+                                @save(vm.newFichero, before='uploadFile')" 
+                          height="500px">
+                    <listbox id="box" 
+                             model="@bind(vm.ficheros)" 
+                             mold="paging" 
+                             pageSize="8" 
+                             checkmark="true" 
+                             rows="8" 
+                             selectedItem="@bind(vm.selectedFichero)"
+                             width="500px"
+                             height="400px"
+                             style="float: left">
+                        <listhead>
+                            <listheader label="Fichero"  sort="auto(ruta)"/>
+                            <listheader label="Fecha" sort="auto(fecha)"  width="100px"  align="center"/>
+                        </listhead>
+                        <template name="model" var="zk_fichero">
+                            <listitem value="@load(zk_fichero)">
+                                <listcell label="@load(zk_fichero.nombre)"/>
+                                <listcell label="@load(zk_fichero.fecha) @converter('formatedDate', format='dd-MMM-yyyy')" />
+                            </listitem>
+                        </template>
+                    </listbox>
+                    <hlayout id="pics" style="float: left; margin-left: 10px" >
+                        <groupbox height="400px" width="455px">
+                            <image src="@load(vm.selectedFichero.extension)" height="100%" width="100%"/>
+                        </groupbox>
+                    </hlayout>
+                    
+                    <button label="Descargar" 
+                            disabled="@load(empty vm.selectedFichero)"
+                            onClick="@command('descargarFichero')" 
+                            src="../images/download.png"
+                            mold="trendy"
+                            style="margin-top: 10px; margin-left: 10px; margin-right: 5px; float: right;"/>
+                    <button id="btnImagen"
+                            label="Adjuntar"
+                            upload="true,maxsize=8192"
+                            onUpload="@command('uploadFile',upload=event)"
+                            src="../images/paperclip.png"
+                            style="margin-top: 10px; float: right"/>
+                    <button label="Eliminar" 
+                            disabled="@load(empty vm.selectedFichero)"
+                            onClick="@command('deleteFichero')" 
+                            src="../images/delete.png"
+                            mold="trendy"
+                            style="margin-top: 10px; margin-left: 10px; margin-right: 5px; float: right;"/>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </window>
+</zk>

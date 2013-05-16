@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <borderlayout id="main" vflex="1" hflex="1">
+        <!--<north id="norte" border="0">
+            <div>
+                <include src="./template/header.zul"/>
+            </div>
+        </north>-->
+        <center>
+                <include src="venta-lista.zul"/>
+        </center>
+    </borderlayout>
+</zk>
