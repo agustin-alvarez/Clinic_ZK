@@ -435,12 +435,12 @@ public class FacturaPdf {
     private void generateHeader(Document doc, PdfContentByte cb) {
         try {
 
-            createHeadings(cb, 150, 790, "Centro Veterinario \"El Rey de la Casa\"", 10);
-            createHeadings(cb, 150, 775, "Luis Miguel Puerto del Canto", 8);
-            createHeadings(cb, 150, 760, "NIF: 25.594.942-J", 8);
-            createHeadings(cb, 150, 745, "C/ Comandante Vázquez Ramos, 4", 8);
-            createHeadings(cb, 150, 730, "Montellano (Sevilla)", 8);
-            createHeadings(cb, 150, 715, "Teléfono: 626 31 06 64", 8);
+            createHeadings(cb, 150, 790, "Centro Veterinario \"Mascotas\"", 10);
+            createHeadings(cb, 150, 775, "Nombre del profesional", 8);
+            createHeadings(cb, 150, 760, "NIF: 11.111.111-A", 8);
+            createHeadings(cb, 150, 745, "C/ Nombre de la calles, 1", 8);
+            createHeadings(cb, 150, 730, "Nombre de la Ciudad (Provincia)", 8);
+            createHeadings(cb, 150, 715, "Teléfono: 600 00 00 00", 8);
 
             cb.setLineWidth(1f);
  
