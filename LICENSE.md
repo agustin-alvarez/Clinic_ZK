@@ -7,5 +7,5 @@ non-profit organizations, students, universities, public schools and non-commerc
 To use ZHighCharts for commercial services, a valid Highcharts license is required.
 More information are available here: [Highcharts JS Licence] (http://shop.highsoft.com/highcharts.html)
 
-  iText is a registered Trademark, if you want use it, it's a valid iText license is required. 
-More information are available here: [iText] (http://itextpdf.com/terms-of-use/index.php)
+  iText® is a registered Trademark, if you want use it, it's a valid iText® license is required. 
+More information are available here: [Terms of use] (http://itextpdf.com/terms-of-use/index.php)
