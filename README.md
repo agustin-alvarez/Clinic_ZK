@@ -1,7 +1,7 @@
 Veterinary Clinical Management
 ==============================
 
-This project uses ZK to manage Veterinary Clinical and iText for to create PDF documents, Hichcharts JS for to show Charts.
+This project uses ZK to manage Veterinary Clinical and iText® for to create PDF documents, Hichcharts JS for to show Charts.
 
 You can try the application on: http://clinica-elreydelacasa.rhcloud.com/ClinicaOpenShift/  (user, User2013)
 
