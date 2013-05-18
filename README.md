@@ -5,6 +5,17 @@ This project uses ZK to manage Veterinary Clinical and iText for to create PDF d
 
 You can try the application on: http://clinica-elreydelacasa.rhcloud.com/ClinicaOpenShift/  (user, User2013)
 
+## Pantallazos (pincha cada imagen para ampliarla) ##
+
+### Frontend ###
+
+[![Main Page](https://dl.dropboxusercontent.com/u/39848385/img/2-principal.png)](https://dl.dropboxusercontent.com/u/39848385/img/2-principal.png)
+[![Filter Customer](https://dl.dropboxusercontent.com/u/39848385/img/4-cliente-filtrar.png)](https://dl.dropboxusercontent.com/u/39848385/img/4-cliente-filtrar.png)
+[![Pet Statistics](https://dl.dropboxusercontent.com/u/39848385/img/12-estadisticas-mascota.png)](https://dl.dropboxusercontent.com/u/39848385/img/12-estadisticas-mascota.png)
+[![Statistics](https://dl.dropboxusercontent.com/u/39848385/img/15-estadisticas-ingresos-gastos.png)](https://dl.dropboxusercontent.com/u/39848385/img/15-estadisticas-ingresos-gastos.png)
+[![Pet History](https://dl.dropboxusercontent.com/u/39848385/img/30-mascota-historial-radiox.png)](https://dl.dropboxusercontent.com/u/39848385/img/30-mascota-historial-radiox.png)
+
+
 ##Manual de instalación
 En esta sección describiremos los pasos para la instalación correcta de la aplicación.
 
